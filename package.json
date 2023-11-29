@@ -1,0 +1,61 @@
+{
+  "name": "@chialab/plasma",
+  "version": "0.1.0",
+  "description": "Generate Custom Elements wrappers for Angular, React, Svelte and Vue.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": "./bin/cli.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dna",
+    "web-components",
+    "angular",
+    "react",
+    "svelte",
+    "vue"
+  ],
+  "author": "Chialab <dev@chialab.io> (https://www.chialab.it)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chialab/plasma"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clear": "rimraf 'dist' 'types' 'tsconfig.tsbuildinfo'",
+    "build": "yarn clear && tsc -b && esbuild src/index.ts src/cli.ts --outdir=dist --bundle --platform=node --format=cjs",
+    "lint": "prettier --check . && eslint .",
+    "prepack": "yarn build && publint"
+  },
+  "dependencies": {
+    "type-fest": "^4.8.2"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.22.0",
+    "@chialab/eslint-config": "^4.0.0",
+    "@chialab/prettier-config": "^1.2.0",
+    "@types/prompts": "^2.4.9",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "custom-elements-manifest": "^2.0.0",
+    "esbuild": "^0.19.8",
+    "eslint": "^8.0.0",
+    "listr2": "^7.0.2",
+    "prettier": "^3.0.0",
+    "prompts": "^2.4.0",
+    "publint": "^0.2.5",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
+  }
+}

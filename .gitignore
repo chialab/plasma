@@ -1,0 +1,6 @@
+.pnp.*
+.yarn/*
+/node_modules
+/types
+/dist
+tsconfig.tsbuildinfo
