@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "TestElement",
+          "members": [
+            {
+              "kind": "field",
+              "name": "stringProp",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "booleanProp",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "numericProp",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "objectProp",
+              "type": {
+                "text": "object | undefined"
+              },
+              "description": ""
+            }
+          ],
+          "tagName": "test-element",
+          "customElement": true
+        },
+        {
+          "kind": "class",
+          "description": "",
+          "name": "TestLink",
+          "members": [
+            {
+              "kind": "field",
+              "name": "stringProp",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "booleanProp",
+              "type": {
+                "text": "boolean | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "numericProp",
+              "type": {
+                "text": "number | undefined"
+              },
+              "description": ""
+            },
+            {
+              "kind": "field",
+              "name": "objectProp",
+              "type": {
+                "text": "object | undefined"
+              },
+              "description": ""
+            }
+          ],
+          "tagName": "test-link",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TestElement",
+          "declaration": {
+            "name": "TestElement",
+            "module": "src/index.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "test-element",
+          "declaration": {
+            "name": "TestElement",
+            "module": "src/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TestLink",
+          "declaration": {
+            "name": "TestLink",
+            "module": "src/index.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "test-link",
+          "extend": "a",
+          "declaration": {
+            "name": "TestLink",
+            "module": "src/index.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

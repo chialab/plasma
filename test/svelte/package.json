@@ -1,0 +1,21 @@
+{
+  "name": "plasma-test-svelte",
+  "type": "module",
+  "customElements": "custom-elements.json",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "prepare": "rimraf 'components' && plasma --framework svelte --outdir components -y",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@chialab/dna": "^4.0.0-alpha.0",
+    "@chialab/plasma": "file:./../..",
+    "@sveltejs/vite-plugin-svelte": "^3.0.1",
+    "jsdom": "^23.0.0",
+    "rimraf": "^5.0.5",
+    "svelte": "^4.2.7",
+    "vite": "^5.0.4",
+    "vitest": "^0.34.6"
+  }
+}

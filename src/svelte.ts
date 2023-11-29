@@ -165,13 +165,13 @@ function getAttributes(tagName: string) {
 function generateSvelteComponent(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
 
-    let script = `import { onMount } from 'svelte';
+    let script = `import { onMount } from 'svelte/internal';
 import '${packageJson.name}';
 `;
 
     script += `
 let __ref;
-let __mounted = false
+let __mounted = false;
 
 onMount(() => {
     __mounted = true;
@@ -201,10 +201,10 @@ onMount(() => {
     }
 
     const markup = definition.extend
-        ? `<${definition.extend} bind:this={__ref} {...$restProps} is="${definition.name}">
+        ? `<${definition.extend} bind:this={__ref} {...$$restProps} is="${definition.name}">
     <slot />
 </${definition.extend}>`
-        : `<${definition.name} bind:this={__ref} {...$restProps}>
+        : `<${definition.name} bind:this={__ref} {...$$restProps}>
     <slot />
 </${definition.name}>`;
 
@@ -222,7 +222,7 @@ ${markup}`;
 function generateSvelteTypings(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
     let declContents = `import { SvelteComponent } from 'svelte';
-import { ${declaration.name} } from '${packageJson.name}';
+import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
 `;
     if (definition.extend) {
         declContents += `import { ${getAttributes(definition.extend).split('<')[0]} } from 'svelte/elements';\n`;
@@ -237,13 +237,18 @@ import { ${declaration.name} } from '${packageJson.name}';
             if (member.privacy && member.privacy !== 'public') {
                 continue;
             }
-            propertiesTypings += `${member.name}: ${declaration.name}['${member.name}'];\n`;
+            const optional =
+                member.type?.text
+                    .split('|')
+                    .map((type) => type.trim())
+                    .includes('undefined') ?? true;
+            propertiesTypings += `${member.name}${optional ? '?' : ''}: Base${declaration.name}['${member.name}'];\n`;
         }
     }
 
     declContents += `
 declare const __propDef: {
-    props: ${definition.extend ? `${getAttributes(definition.extend)} &` : ''} {
+    props: ${definition.extend ? `${getAttributes(definition.extend)} & ` : ''}{
 ${propertiesTypings
     .trim()
     .split('\n')

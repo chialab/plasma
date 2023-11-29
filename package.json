@@ -4,7 +4,9 @@
   "description": "Generate Custom Elements wrappers for Angular, React, Svelte and Vue.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "./bin/cli.js",
+  "bin": {
+    "plasma": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -52,6 +54,7 @@
     "esbuild": "^0.19.8",
     "eslint": "^8.0.0",
     "listr2": "^7.0.2",
+    "package-up": "^5.0.0",
     "prettier": "^3.0.0",
     "prompts": "^2.4.0",
     "publint": "^0.2.5",

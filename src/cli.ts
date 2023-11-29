@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { Listr } from 'listr2';
+import { packageUp } from 'package-up';
 import prompts from 'prompts';
 import { candidates, SUPPORTED, transform, UNSUPPORTED, type Frameworks } from './index';
 import { parseManifestFromPackage, parsePackageJson } from './parser';
@@ -33,11 +34,20 @@ program
     .description(json.description)
     .version(json.version)
 
-    .argument('<input>', 'Package.json path')
-    .requiredOption('-o, --outdir <outdir>', 'Output directory')
-    .option('-y, --yes', 'Convert all candidates to all available frameworks')
+    .option('-c, --cwd <path>', 'current working directory to use')
+    .option('-f, --framework <framework>', 'the framework to convert to')
+    .requiredOption('-o, --outdir <outdir>', 'output directory')
+    .option('-y, --yes', 'convert all candidates to all available frameworks')
 
-    .action(async (input, options) => {
+    .action(async (options) => {
+        const cwd = options.cwd ?? process.cwd();
+        const yes = options.yes || !process.stdout.isTTY;
+
+        const input = await packageUp({ cwd });
+        if (!input) {
+            throw new Error('No package.json found');
+        }
+
         const json = await parsePackageJson(input);
         const manifest = await parseManifestFromPackage(input, json);
         if (!manifest) {
@@ -46,7 +56,7 @@ program
 
         const data = Array.from(candidates(json, manifest));
         let selected: string[];
-        if (options.yes) {
+        if (yes) {
             selected = data.map(({ declaration }) => declaration.name);
         } else {
             selected = (
@@ -65,8 +75,10 @@ program
         }
 
         let frameworks: Frameworks[];
-        if (options.yes) {
+        if (yes) {
             frameworks = SUPPORTED;
+        } else if (options.framework) {
+            frameworks = [options.framework].filter((framework) => SUPPORTED.includes(framework));
         } else {
             frameworks = (
                 await prompts({
@@ -90,7 +102,7 @@ program
             ).frameworks;
         }
 
-        if (!frameworks) {
+        if (!frameworks || frameworks.length === 0) {
             throw new Error('No frameworks selected');
         }
 
@@ -108,7 +120,7 @@ program
                                 }
 
                                 const outFile = await transform(entry, framework, {
-                                    outdir: join(options.outdir, framework),
+                                    outdir: options.framework ? options.outdir : join(options.outdir, framework),
                                 });
                                 task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
                                     framework

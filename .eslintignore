@@ -4,6 +4,7 @@ node_modules
 /dist
 /types
 /node_modules
+/test/*/components
 CHANGELOG.md
 LICENSE.md
 
