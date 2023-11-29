@@ -51,6 +51,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs:
+      - build
     strategy:
       matrix:
         framework:
