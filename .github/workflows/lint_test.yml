@@ -71,11 +71,8 @@ jobs:
         with:
           name: Plasma
 
-      - name: Select the test directory
-        run: cd test/${{ matrix.framework }}
-
       - name: Install project dependencies
-        run: yarn install
+        run: yarn -C test/${{ matrix.framework }} install
 
       - name: Run tests
-        run: yarn test
+        run: yarn -C test/${{ matrix.framework }} test
