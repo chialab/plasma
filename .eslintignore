@@ -4,7 +4,7 @@ node_modules
 /dist
 /types
 /node_modules
-/test/*/components
+/test/svelte/**/*.svelte
 CHANGELOG.md
 LICENSE.md
 

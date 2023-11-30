@@ -200,9 +200,9 @@ function forward(event) {
 }
 
 function forwardEvents() {
-    __boundEvents.forEach((event) => {
-        __listeners.push(listen(__ref, event, forward));
-    });
+    while (__boundEvents.length) {
+        __listeners.push(listen(__ref, __boundEvents.pop(), forward));
+    }
 
     return () => {
         __listeners.forEach((unlisten) => unlisten());
@@ -220,11 +220,9 @@ function forwardEvents() {
                 continue;
             }
             const setter = `$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`;
-            if (member.default) {
-                script += `export let ${member.name} = ${JSON.parse(member.default)};\n${setter}\n\n`;
-            } else {
-                script += `export let ${member.name};\n${setter}\n\n`;
-            }
+            script += `export let ${member.name} = ${
+                'default' in member ? JSON.parse(member.default as string) : 'undefined'
+            };\n${setter}\n\n`;
         }
     }
 
@@ -232,6 +230,13 @@ function forwardEvents() {
     if (declaration.events) {
         for (const event of declaration.events) {
             events.push(`on:${event.name}`);
+        }
+    }
+
+    const slots = [];
+    if (declaration.slots) {
+        for (const slot of declaration.slots) {
+            slots.push(`<slot name="${slot.name}" />`);
         }
     }
 
@@ -244,6 +249,7 @@ function forwardEvents() {
     {...$$restProps}
 >
     <slot />
+    ${slots.join('\n    ')}
 </${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
@@ -252,6 +258,7 @@ function forwardEvents() {
     {...$$restProps}
 >
     <slot />
+    ${slots.join('\n    ')}
 </${definition.name}>`;
 
     return `<script>
@@ -268,8 +275,8 @@ ${markup}`;
 function generateSvelteTypings(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
     let imports = `import { SvelteComponent } from 'svelte';
-    import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
-    `;
+import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+`;
     if (definition.extend) {
         imports += `import { ${getAttributes(definition.extend).split('<')[0]} } from 'svelte/elements';\n`;
     }
@@ -302,6 +309,13 @@ function generateSvelteTypings(entry: Entry) {
         }
     }
 
+    let slotsTypings = '';
+    if (declaration.slots) {
+        for (const slot of declaration.slots) {
+            slotsTypings += `'${slot.name}': {};\n`;
+        }
+    }
+
     const declContents = `
 declare const __propDef: {
     props: ${definition.extend ? `${getAttributes(definition.extend)} & ` : ''}{
@@ -319,7 +333,13 @@ ${eventsTypings
     .join('\n')}
         [key: string]: CustomEvent;
     };
-    slots: {};
+    slots: {
+${slotsTypings
+    .trim()
+    .split('\n')
+    .map((line) => `        ${line}`)
+    .join('\n')}
+    };
 };
 
 export type ${declaration.name}Props = typeof __propDef.props;

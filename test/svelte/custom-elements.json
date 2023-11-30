@@ -4,12 +4,18 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "index.ts",
+      "path": "src/TestElement.ts",
       "declarations": [
         {
           "kind": "class",
           "description": "",
           "name": "TestElement",
+          "slots": [
+            {
+              "description": "The icon slot.",
+              "name": "icon"
+            }
+          ],
           "members": [
             {
               "kind": "field",
@@ -51,11 +57,41 @@
           },
           "tagName": "test-element",
           "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "TestElement",
+          "declaration": {
+            "name": "TestElement",
+            "module": "src/TestElement.ts"
+          }
         },
+        {
+          "kind": "custom-element-definition",
+          "name": "test-element",
+          "declaration": {
+            "name": "TestElement",
+            "module": "src/TestElement.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/TestLink.ts",
+      "declarations": [
         {
           "kind": "class",
           "description": "",
           "name": "TestLink",
+          "slots": [
+            {
+              "description": "The icon slot.",
+              "name": "icon"
+            }
+          ],
           "members": [
             {
               "kind": "field",
@@ -92,7 +128,7 @@
             }
           ],
           "superclass": {
-            "module": "index.ts"
+            "module": "src/TestLink.ts"
           },
           "tagName": "test-link",
           "customElement": true
@@ -101,26 +137,10 @@
       "exports": [
         {
           "kind": "js",
-          "name": "TestElement",
-          "declaration": {
-            "name": "TestElement",
-            "module": "index.ts"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "test-element",
-          "declaration": {
-            "name": "TestElement",
-            "module": "index.ts"
-          }
-        },
-        {
-          "kind": "js",
           "name": "TestLink",
           "declaration": {
             "name": "TestLink",
-            "module": "index.ts"
+            "module": "src/TestLink.ts"
           }
         },
         {
@@ -129,7 +149,30 @@
           "extend": "a",
           "declaration": {
             "name": "TestLink",
-            "module": "index.ts"
+            "module": "src/TestLink.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./TestElement"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "package": "./TestLink"
           }
         }
       ]

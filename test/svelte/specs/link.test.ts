@@ -1,10 +1,10 @@
 import { tick } from 'svelte';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import TestElement from './components/TestElement.svelte';
+import TestLink from '../src/TestLink.svelte';
 
 let host: HTMLElement;
 
-describe('Element', () => {
+describe('Link', () => {
     afterEach(() => {
         host.remove();
     });
@@ -13,7 +13,7 @@ describe('Element', () => {
         host = document.createElement('div');
         host.setAttribute('id', 'host');
         document.body.appendChild(host);
-        const instance = new TestElement({
+        const instance = new TestLink({
             target: host,
             props: {
                 stringProp: 'test',
@@ -22,7 +22,7 @@ describe('Element', () => {
                 objectProp: { test: true },
             },
         });
-        const node = host.querySelector('test-element') as HTMLElement;
+        const node = host.querySelector('a') as HTMLElement;
         const onStringChange = vi.fn();
         instance.$on('stringchange', onStringChange);
         const onClick = vi.fn((event) => event.preventDefault());

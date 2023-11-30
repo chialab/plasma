@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [svelte({ hot: !process.env.VITEST })],
     resolve: {
         alias: {
-            'plasma-test-svelte': fileURLToPath(new URL('./index.ts', import.meta.url)),
+            'plasma-test-svelte': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         },
     },
     test: {
