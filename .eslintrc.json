@@ -1,3 +1,8 @@
 {
-  "extends": "@chialab/eslint-config"
+  "extends": "@chialab/eslint-config",
+  "rules": {
+    "indent": 0,
+    "import/extensions": 0,
+    "import/first": 0
+  }
 }
