@@ -72,7 +72,7 @@ jobs:
           name: Plasma
 
       - name: Install project dependencies
-        run: yarn -C test/${{ matrix.framework }} install
+        run: yarn --cwd test/${{ matrix.framework }} install
 
       - name: Run tests
-        run: yarn -C test/${{ matrix.framework }} test
+        run: yarn --cwd test/${{ matrix.framework }} run test
