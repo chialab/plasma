@@ -2,6 +2,8 @@
 
 Generate Custom Elements wrappers for Angular, React, Svelte and Vue.
 
+> `plasma` is the imperative form for the Italian verb _plasmare_, _to shape_ in English.
+
 ## Installation
 
 ```
