@@ -200,11 +200,27 @@ onMount(() => {
         }
     }
 
+    const events = [];
+    if (declaration.events) {
+        for (const event of declaration.events) {
+            events.push(`on:${event.name}`);
+        }
+    }
+
     const markup = definition.extend
-        ? `<${definition.extend} bind:this={__ref} {...$$restProps} is="${definition.name}">
+        ? `<${definition.extend}
+    bind:this={__ref}
+    is="${definition.name}"
+    {...$$restProps}
+    ${events.join('\n    ')}
+>
     <slot />
 </${definition.extend}>`
-        : `<${definition.name} bind:this={__ref} {...$$restProps}>
+        : `<${definition.name}
+    bind:this={__ref}
+    {...$$restProps}
+    ${events.join('\n    ')}
+>
     <slot />
 </${definition.name}>`;
 
@@ -221,11 +237,11 @@ ${markup}`;
 
 function generateSvelteTypings(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
-    let declContents = `import { SvelteComponent } from 'svelte';
-import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
-`;
+    let imports = `import { SvelteComponent } from 'svelte';
+    import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+    `;
     if (definition.extend) {
-        declContents += `import { ${getAttributes(definition.extend).split('<')[0]} } from 'svelte/elements';\n`;
+        imports += `import { ${getAttributes(definition.extend).split('<')[0]} } from 'svelte/elements';\n`;
     }
 
     let propertiesTypings = '';
@@ -246,7 +262,17 @@ import { ${declaration.name} as Base${declaration.name} } from '${packageJson.na
         }
     }
 
-    declContents += `
+    let eventsTypings = '';
+    if (declaration.events) {
+        imports += `import { EventHandler } from 'svelte/elements';\n`;
+
+        for (const event of declaration.events) {
+            propertiesTypings += `'on:${event.name}'?: EventHandler<CustomEvent>;\n`;
+            eventsTypings += `'${event.name}': CustomEvent;\n`;
+        }
+    }
+
+    const declContents = `
 declare const __propDef: {
     props: ${definition.extend ? `${getAttributes(definition.extend)} & ` : ''}{
 ${propertiesTypings
@@ -254,9 +280,13 @@ ${propertiesTypings
     .split('\n')
     .map((line) => `        ${line}`)
     .join('\n')}
-    },
+    };
     events: {
-        [evt: string]: CustomEvent<any>;
+${eventsTypings
+    .trim()
+    .split('\n')
+    .map((line) => `        ${line}`)
+    .join('\n')}
     };
     slots: {};
 };
@@ -266,12 +296,12 @@ export type ${declaration.name}Events = typeof __propDef.events;
 export type ${declaration.name}Slots = typeof __propDef.slots;
 export default class ${declaration.name} extends SvelteComponent<${declaration.name}Props, ${declaration.name}Events, ${
         declaration.name
-    }Slots > {
+    }Slots> {
 }
 export {};
 `;
 
-    return declContents;
+    return `${imports}${declContents}`;
 }
 
 export async function transformSvelte(entry: Entry, options: SvelteTransformOptions) {

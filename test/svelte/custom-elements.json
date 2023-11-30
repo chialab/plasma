@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "src/index.ts",
+      "path": "index.ts",
       "declarations": [
         {
           "kind": "class",
@@ -16,34 +16,39 @@
               "name": "stringProp",
               "type": {
                 "text": "string | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "booleanProp",
               "type": {
                 "text": "boolean | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "numericProp",
               "type": {
                 "text": "number | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "objectProp",
               "type": {
                 "text": "object | undefined"
-              },
-              "description": ""
+              }
             }
           ],
+          "events": [
+            {
+              "name": "stringchange"
+            }
+          ],
+          "superclass": {
+            "name": "Component",
+            "package": "@chialab/dna"
+          },
           "tagName": "test-element",
           "customElement": true
         },
@@ -57,34 +62,38 @@
               "name": "stringProp",
               "type": {
                 "text": "string | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "booleanProp",
               "type": {
                 "text": "boolean | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "numericProp",
               "type": {
                 "text": "number | undefined"
-              },
-              "description": ""
+              }
             },
             {
               "kind": "field",
               "name": "objectProp",
               "type": {
                 "text": "object | undefined"
-              },
-              "description": ""
+              }
             }
           ],
+          "events": [
+            {
+              "name": "stringchange"
+            }
+          ],
+          "superclass": {
+            "module": "index.ts"
+          },
           "tagName": "test-link",
           "customElement": true
         }
@@ -95,7 +104,7 @@
           "name": "TestElement",
           "declaration": {
             "name": "TestElement",
-            "module": "src/index.ts"
+            "module": "index.ts"
           }
         },
         {
@@ -103,7 +112,7 @@
           "name": "test-element",
           "declaration": {
             "name": "TestElement",
-            "module": "src/index.ts"
+            "module": "index.ts"
           }
         },
         {
@@ -111,7 +120,7 @@
           "name": "TestLink",
           "declaration": {
             "name": "TestLink",
-            "module": "src/index.ts"
+            "module": "index.ts"
           }
         },
         {
@@ -120,7 +129,7 @@
           "extend": "a",
           "declaration": {
             "name": "TestLink",
-            "module": "src/index.ts"
+            "module": "index.ts"
           }
         }
       ]

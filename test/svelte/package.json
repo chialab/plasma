@@ -5,12 +5,16 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "prepare": "rimraf 'components' && plasma --framework svelte --outdir components -y",
+    "manifest": "custom-elements-manifest analyze --config cem.config.js",
+    "generate": "plasma --framework svelte --outdir components -y",
+    "prepare": "rimraf 'components' && yarn manifest && yarn generate",
     "test": "vitest"
   },
   "devDependencies": {
     "@chialab/dna": "^4.0.0-alpha.0",
-    "@chialab/plasma": "file:./../..",
+    "@chialab/manifest-analyzer-dna-plugin": "^3.0.1-alpha.0",
+    "@chialab/plasma": "file:../..",
+    "@custom-elements-manifest/analyzer": "^0.9.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "jsdom": "^23.0.0",
     "rimraf": "^5.0.5",

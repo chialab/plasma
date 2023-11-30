@@ -1,20 +1,20 @@
-import { Component, customElement, HTML, html } from '@chialab/dna';
+import { Component, customElement, HTML, html, property } from '@chialab/dna';
 
+/**
+ * @fires stringchange
+ */
 @customElement('test-element')
 export class TestElement extends Component {
-    static get properties() {
-        return {
-            stringProp: String,
-            booleanProp: Boolean,
-            numericProp: Number,
-            objectProp: Object,
-        };
-    }
-
-    declare stringProp?: string;
-    declare booleanProp?: boolean;
-    declare numericProp?: number;
-    declare objectProp?: object;
+    @property({
+        event: 'stringchange',
+    })
+    stringProp?: string;
+    @property()
+    booleanProp?: boolean;
+    @property()
+    numericProp?: number;
+    @property()
+    objectProp?: object;
 
     render() {
         return html`
@@ -26,23 +26,23 @@ export class TestElement extends Component {
     }
 }
 
+/**
+ * @fires stringchange
+ */
 @customElement('test-link', {
     extends: 'a',
 })
 export class TestLink extends HTML.Anchor {
-    static get properties() {
-        return {
-            stringProp: String,
-            booleanProp: Boolean,
-            numericProp: Number,
-            objectProp: Object,
-        };
-    }
-
-    declare stringProp?: string;
-    declare booleanProp?: boolean;
-    declare numericProp?: number;
-    declare objectProp?: object;
+    @property({
+        event: 'stringchange',
+    })
+    stringProp?: string;
+    @property()
+    booleanProp?: boolean;
+    @property()
+    numericProp?: number;
+    @property()
+    objectProp?: object;
 
     render() {
         return html`
