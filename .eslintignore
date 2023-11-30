@@ -4,7 +4,6 @@ node_modules
 /dist
 /types
 /node_modules
-/test/svelte/**/*.svelte
 CHANGELOG.md
 LICENSE.md
 
@@ -12,3 +11,6 @@ LICENSE.md
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
+
+/test/svelte/src/*.svelte
+/test/svelte/src/*.svelte.d.ts

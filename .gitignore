@@ -6,3 +6,6 @@
 /types
 /dist
 tsconfig.tsbuildinfo
+
+/test/svelte/src/*.svelte
+/test/svelte/src/*.svelte.d.ts
