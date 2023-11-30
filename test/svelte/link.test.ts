@@ -10,7 +10,6 @@ describe('Link', () => {
     });
 
     test('mount component', async () => {
-        const spy = vi.fn();
         host = document.createElement('div');
         host.setAttribute('id', 'host');
         document.body.appendChild(host);
@@ -23,14 +22,21 @@ describe('Link', () => {
                 objectProp: { test: true },
             },
         });
-        instance.$on('stringchange', spy);
+        const node = host.querySelector('a') as HTMLElement;
+        const onStringChange = vi.fn();
+        instance.$on('stringchange', onStringChange);
+        const onClick = vi.fn((event) => event.preventDefault());
+        instance.$on('click', onClick);
         expect(instance).toBeTruthy();
         expect(host.innerHTML).toMatchSnapshot();
-        expect(spy).not.toHaveBeenCalled();
+        expect(onStringChange).not.toHaveBeenCalled();
+        expect(onClick).not.toHaveBeenCalled();
         instance.$$set({
             stringProp: 'changed',
         });
         await tick();
-        expect(spy).toHaveBeenCalled();
+        expect(onStringChange).toHaveBeenCalled();
+        node.click();
+        expect(onClick).toHaveBeenCalled();
     });
 });

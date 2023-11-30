@@ -165,13 +165,17 @@ function getAttributes(tagName: string) {
 function generateSvelteComponent(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
 
-    let script = `import { onMount } from 'svelte/internal';
+    let script = `import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
 import '${packageJson.name}';
 `;
 
     script += `
 let __ref;
 let __mounted = false;
+let __component = get_current_component();
+let __boundEvents = [];
+let __listeners = [];
+let __on = __component.$on;
 
 onMount(() => {
     __mounted = true;
@@ -180,6 +184,30 @@ onMount(() => {
         __mounted = false;
     };
 });
+
+__component.$on = (event, ...args) => {
+    if (__mounted) {
+        __listeners.push(listen(__ref, event, forward));
+    } else {
+        __boundEvents.push(event);
+    }
+
+    return __on.call(__component, event, ...args);
+};
+
+function forward(event) {
+    bubble(__component, event);
+}
+
+function forwardEvents() {
+    __boundEvents.forEach((event) => {
+        __listeners.push(listen(__ref, event, forward));
+    });
+
+    return () => {
+        __listeners.forEach((unlisten) => unlisten());
+    };
+}
 
 `;
 
@@ -211,15 +239,17 @@ onMount(() => {
         ? `<${definition.extend}
     bind:this={__ref}
     is="${definition.name}"
-    {...$$restProps}
     ${events.join('\n    ')}
+    use:forwardEvents
+    {...$$restProps}
 >
     <slot />
 </${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
-    {...$$restProps}
     ${events.join('\n    ')}
+    use:forwardEvents
+    {...$$restProps}
 >
     <slot />
 </${definition.name}>`;
@@ -287,6 +317,7 @@ ${eventsTypings
     .split('\n')
     .map((line) => `        ${line}`)
     .join('\n')}
+        [key: string]: CustomEvent;
     };
     slots: {};
 };
