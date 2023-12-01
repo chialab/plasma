@@ -9,7 +9,6 @@ declare const __propDef: {
         booleanProp?: BaseTestLink['booleanProp'];
         numericProp?: BaseTestLink['numericProp'];
         objectProp?: BaseTestLink['objectProp'];
-        'on:stringchange'?: EventHandler<CustomEvent>;
     };
     events: {
         'stringchange': CustomEvent;

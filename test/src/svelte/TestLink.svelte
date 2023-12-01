@@ -57,7 +57,6 @@
 <a
     bind:this={__ref}
     is="test-link"
-    on:stringchange
     use:forwardEvents
     {...$$restProps}
 >

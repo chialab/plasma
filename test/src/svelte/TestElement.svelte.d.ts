@@ -1,14 +1,14 @@
 import { SvelteComponent } from 'svelte';
 import { TestElement as BaseTestElement } from 'plasma-test';
+import { HTMLAttributes } from 'svelte/elements';
 import { EventHandler } from 'svelte/elements';
 
 declare const __propDef: {
-    props: {
+    props: HTMLAttributes<HTMLElement> & {
         stringProp?: BaseTestElement['stringProp'];
         booleanProp?: BaseTestElement['booleanProp'];
         numericProp?: BaseTestElement['numericProp'];
         objectProp?: BaseTestElement['objectProp'];
-        'on:stringchange'?: EventHandler<CustomEvent>;
     };
     events: {
         'stringchange': CustomEvent;

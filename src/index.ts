@@ -14,6 +14,8 @@ export const SUPPORTED = [Frameworks.React, Frameworks.Svelte];
 export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Preact, Frameworks.Vue];
 
 export * from './walker';
+export * from './svelte';
+export * from './react';
 
 export async function transform<F extends Frameworks>(
     entry: Entry,

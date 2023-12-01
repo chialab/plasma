@@ -1,26 +1,29 @@
 import { tick } from 'svelte';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import TestElement from './src/svelte/TestElement.svelte';
 import TestElementRoot from './src/TestElementRoot.svelte';
 
 let host: HTMLElement;
 
 describe('Element', () => {
+    beforeEach(() => {
+        host = document.createElement('div');
+        document.body.appendChild(host);
+    });
+
     afterEach(() => {
         host.remove();
     });
 
     test('mount component', async () => {
-        host = document.createElement('div');
-        host.setAttribute('id', 'host');
-        document.body.appendChild(host);
         const instance = new TestElement({
             target: host,
             props: {
-                stringProp: 'test',
-                booleanProp: true,
-                numericProp: 1,
-                objectProp: { test: true },
+                'stringProp': 'test',
+                'booleanProp': true,
+                'numericProp': 1,
+                'objectProp': { test: true },
+                'data-attr': 'test',
             },
         });
         const node = host.querySelector('test-element') as HTMLElement;
@@ -42,9 +45,6 @@ describe('Element', () => {
     });
 
     test('named slot', () => {
-        host = document.createElement('div');
-        host.setAttribute('id', 'host');
-        document.body.appendChild(host);
         new TestElementRoot({ target: host });
         expect(host.innerHTML).toMatchSnapshot();
     });

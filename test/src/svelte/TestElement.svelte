@@ -56,7 +56,6 @@
 
 <test-element
     bind:this={__ref}
-    on:stringchange
     use:forwardEvents
     {...$$restProps}
 >

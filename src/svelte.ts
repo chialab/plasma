@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { filterPublicMemebers, isOptionalClassField } from './utils';
 import type { Entry } from './walker';
 
 export interface SvelteTransformOptions {
@@ -162,7 +163,7 @@ function getAttributes(tagName: string) {
     }
 }
 
-function generateSvelteComponent(entry: Entry) {
+export function generateSvelteComponent(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
 
     let script = `import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
@@ -211,27 +212,12 @@ function forwardEvents() {
 
 `;
 
-    if (declaration.members) {
-        for (const member of declaration.members) {
-            if (member.kind !== 'field') {
-                continue;
-            }
-            if (member.privacy && member.privacy !== 'public') {
-                continue;
-            }
-            const setter = `$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`;
-            script += `export let ${member.name} = ${
-                'default' in member ? JSON.parse(member.default as string) : 'undefined'
-            };\n${setter}\n\n`;
-        }
-    }
-
-    const events = [];
-    if (declaration.events) {
-        for (const event of declaration.events) {
-            events.push(`on:${event.name}`);
-        }
-    }
+    filterPublicMemebers(declaration).forEach((member) => {
+        const setter = `$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`;
+        script += `export let ${member.name} = ${
+            'default' in member ? JSON.parse(member.default as string) : 'undefined'
+        };\n${setter}\n\n`;
+    });
 
     const slots = [];
     if (declaration.slots) {
@@ -244,7 +230,6 @@ function forwardEvents() {
         ? `<${definition.extend}
     bind:this={__ref}
     is="${definition.name}"
-    ${events.join('\n    ')}
     use:forwardEvents
     {...$$restProps}
 >
@@ -253,7 +238,6 @@ function forwardEvents() {
 </${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
-    ${events.join('\n    ')}
     use:forwardEvents
     {...$$restProps}
 >
@@ -272,39 +256,23 @@ ${script
 ${markup}`;
 }
 
-function generateSvelteTypings(entry: Entry) {
+export function generateSvelteTypings(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
     let imports = `import { SvelteComponent } from 'svelte';
 import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
 `;
-    if (definition.extend) {
-        imports += `import { ${getAttributes(definition.extend).split('<')[0]} } from 'svelte/elements';\n`;
-    }
 
-    let propertiesTypings = '';
-    if (declaration.members) {
-        for (const member of declaration.members) {
-            if (member.kind !== 'field') {
-                continue;
-            }
-            if (member.privacy && member.privacy !== 'public') {
-                continue;
-            }
-            const optional =
-                member.type?.text
-                    .split('|')
-                    .map((type) => type.trim())
-                    .includes('undefined') ?? true;
-            propertiesTypings += `${member.name}${optional ? '?' : ''}: Base${declaration.name}['${member.name}'];\n`;
-        }
-    }
+    const propertiesTypings = filterPublicMemebers(declaration).map(
+        (member) =>
+            `${member.name}${isOptionalClassField(member) ? '?' : ''}: Base${declaration.name}['${member.name}'];`
+    );
 
     let eventsTypings = '';
     if (declaration.events) {
         imports += `import { EventHandler } from 'svelte/elements';\n`;
 
         for (const event of declaration.events) {
-            propertiesTypings += `'on:${event.name}'?: EventHandler<CustomEvent>;\n`;
             eventsTypings += `'${event.name}': CustomEvent;\n`;
         }
     }
@@ -318,12 +286,8 @@ import { ${declaration.name} as Base${declaration.name} } from '${packageJson.na
 
     const declContents = `
 declare const __propDef: {
-    props: ${definition.extend ? `${getAttributes(definition.extend)} & ` : ''}{
-${propertiesTypings
-    .trim()
-    .split('\n')
-    .map((line) => `        ${line}`)
-    .join('\n')}
+    props: ${getAttributes(definition.extend ?? definition.name)} & {
+        ${propertiesTypings.join('\n        ')}
     };
     events: {
 ${eventsTypings

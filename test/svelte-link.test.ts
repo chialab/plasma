@@ -1,25 +1,28 @@
 import { tick } from 'svelte';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import TestLink from './src/svelte/TestLink.svelte';
 
 let host: HTMLElement;
 
 describe('Link', () => {
+    beforeEach(() => {
+        host = document.createElement('div');
+        document.body.appendChild(host);
+    });
+
     afterEach(() => {
         host.remove();
     });
 
     test('mount component', async () => {
-        host = document.createElement('div');
-        host.setAttribute('id', 'host');
-        document.body.appendChild(host);
         const instance = new TestLink({
             target: host,
             props: {
-                stringProp: 'test',
-                booleanProp: true,
-                numericProp: 1,
-                objectProp: { test: true },
+                'stringProp': 'test',
+                'booleanProp': true,
+                'numericProp': 1,
+                'objectProp': { test: true },
+                'data-attr': 'test',
             },
         });
         const node = host.querySelector('a') as HTMLElement;
