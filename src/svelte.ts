@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { filterPublicMemebers, isOptionalClassField } from './utils';
 import type { Entry } from './walker';
 
@@ -324,7 +324,7 @@ export async function transformSvelte(entry: Entry, options: SvelteTransformOpti
     const outFile = join(options.outdir, `${declaration.name}.svelte`);
     const declFile = `${outFile}.d.ts`;
 
-    await mkdir(dirname(outFile), {
+    await mkdir(options.outdir, {
         recursive: true,
     });
     await Promise.all([

@@ -17,6 +17,7 @@ export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Vue];
 export * from './walker';
 export * from './svelte';
 export * from './react';
+export * from './preact';
 
 export async function transform<F extends Frameworks>(
     entry: Entry,

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { filterPublicMemebers, isOptionalClassField } from './utils';
+import { join } from 'node:path';
+import { capitalize, filterPublicMemebers, isOptionalClassField } from './utils';
 import type { Entry } from './walker';
 
 export interface PreactTransformOptions {
@@ -8,10 +8,6 @@ export interface PreactTransformOptions {
      * The output directory to write the converted components to.
      */
     outdir: string;
-}
-
-function capitalize(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function generatePreactComponent(entry: Entry) {
@@ -96,7 +92,7 @@ export async function transformPreact(entry: Entry, options: PreactTransformOpti
     const outFile = join(options.outdir, `${declaration.name}.js`);
     const declFile = join(options.outdir, `${declaration.name}.d.ts`);
 
-    await mkdir(dirname(outFile), {
+    await mkdir(options.outdir, {
         recursive: true,
     });
     await Promise.all([
