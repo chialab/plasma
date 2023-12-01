@@ -1,5 +1,5 @@
 import { SvelteComponent } from 'svelte';
-import { TestElement as BaseTestElement } from 'plasma-test-svelte';
+import { TestElement as BaseTestElement } from 'plasma-test';
 import { EventHandler } from 'svelte/elements';
 
 declare const __propDef: {

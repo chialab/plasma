@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "src/TestElement.ts",
+      "path": "test/src/TestElement.ts",
       "declarations": [
         {
           "kind": "class",
@@ -65,7 +65,7 @@
           "name": "TestElement",
           "declaration": {
             "name": "TestElement",
-            "module": "src/TestElement.ts"
+            "module": "test/src/TestElement.ts"
           }
         },
         {
@@ -73,14 +73,14 @@
           "name": "test-element",
           "declaration": {
             "name": "TestElement",
-            "module": "src/TestElement.ts"
+            "module": "test/src/TestElement.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/TestLink.ts",
+      "path": "test/src/TestLink.ts",
       "declarations": [
         {
           "kind": "class",
@@ -128,7 +128,7 @@
             }
           ],
           "superclass": {
-            "module": "src/TestLink.ts"
+            "module": "test/src/TestLink.ts"
           },
           "tagName": "test-link",
           "customElement": true
@@ -140,7 +140,7 @@
           "name": "TestLink",
           "declaration": {
             "name": "TestLink",
-            "module": "src/TestLink.ts"
+            "module": "test/src/TestLink.ts"
           }
         },
         {
@@ -149,14 +149,14 @@
           "extend": "a",
           "declaration": {
             "name": "TestLink",
-            "module": "src/TestLink.ts"
+            "module": "test/src/TestLink.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/index.ts",
+      "path": "test/src/index.ts",
       "declarations": [],
       "exports": [
         {

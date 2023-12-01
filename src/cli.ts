@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 import { readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { Listr } from 'listr2';
@@ -26,7 +27,7 @@ const colorFramework = (framework: string) => {
     }
 };
 
-const packageJsonFile = resolve(__dirname, '../package.json');
+const packageJsonFile = fileURLToPath(new URL('../package.json', import.meta.url));
 const json = JSON.parse(readFileSync(packageJsonFile, 'utf-8'));
 
 program
@@ -34,16 +35,15 @@ program
     .description(json.description)
     .version(json.version)
 
-    .option('-c, --cwd <path>', 'current working directory to use')
+    .argument('[input]', 'source directory')
     .option('-f, --framework <framework>', 'the framework to convert to')
     .requiredOption('-o, --outdir <outdir>', 'output directory')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
 
-    .action(async (options) => {
-        const cwd = options.cwd ?? process.cwd();
-        const yes = options.yes || !process.stdout.isTTY;
+    .action(async (sourceDir, options) => {
+        sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
 
-        const input = await packageUp({ cwd });
+        const input = await packageUp({ cwd: sourceDir });
         if (!input) {
             throw new Error('No package.json found');
         }
@@ -54,6 +54,7 @@ program
             throw new Error('No custom elements manifest found');
         }
 
+        const yes = options.yes || !process.stdout.isTTY;
         const data = Array.from(candidates(json, manifest));
         let selected: string[];
         if (yes) {
@@ -120,7 +121,7 @@ program
                                 }
 
                                 const outFile = await transform(entry, framework, {
-                                    outdir: options.framework ? options.outdir : join(options.outdir, framework),
+                                    outdir: options.outdir.replace(/\[framework\]/g, framework),
                                 });
                                 task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
                                     framework

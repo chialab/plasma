@@ -1,0 +1,7 @@
+{
+  "name": "plasma-test",
+  "type": "module",
+  "customElements": "custom-elements.json",
+  "private": true,
+  "main": "src/index.ts"
+}

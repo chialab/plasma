@@ -1,11 +1,7 @@
 .pnp.*
 .yarn/*
 /node_modules
-/test/*/node_modules
 /test/*/components
 /types
 /dist
 tsconfig.tsbuildinfo
-
-/test/svelte/src/*.svelte
-/test/svelte/src/*.svelte.d.ts

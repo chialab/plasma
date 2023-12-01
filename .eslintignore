@@ -12,5 +12,4 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
-/test/svelte/src/*.svelte
-/test/svelte/src/*.svelte.d.ts
+/test/src/**/*

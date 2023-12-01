@@ -1,5 +1,5 @@
 import { SvelteComponent } from 'svelte';
-import { TestLink as BaseTestLink } from 'plasma-test-svelte';
+import { TestLink as BaseTestLink } from 'plasma-test';
 import { HTMLAnchorAttributes } from 'svelte/elements';
 import { EventHandler } from 'svelte/elements';
 

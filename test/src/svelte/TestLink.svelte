@@ -1,6 +1,6 @@
 <script>
     import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
-    import 'plasma-test-svelte';
+    import 'plasma-test';
     
     let __ref;
     let __mounted = false;
@@ -54,12 +54,13 @@
     $: __ref && __mounted && Object.assign(__ref, { objectProp });
 </script>
 
-<test-element
+<a
     bind:this={__ref}
+    is="test-link"
     on:stringchange
     use:forwardEvents
     {...$$restProps}
 >
     <slot />
     <slot name="icon" />
-</test-element>
+</a>

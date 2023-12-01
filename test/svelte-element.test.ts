@@ -1,10 +1,11 @@
 import { tick } from 'svelte';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import TestLink from '../src/TestLink.svelte';
+import TestElement from './src/svelte/TestElement.svelte';
+import TestElementRoot from './src/TestElementRoot.svelte';
 
 let host: HTMLElement;
 
-describe('Link', () => {
+describe('Element', () => {
     afterEach(() => {
         host.remove();
     });
@@ -13,7 +14,7 @@ describe('Link', () => {
         host = document.createElement('div');
         host.setAttribute('id', 'host');
         document.body.appendChild(host);
-        const instance = new TestLink({
+        const instance = new TestElement({
             target: host,
             props: {
                 stringProp: 'test',
@@ -22,7 +23,7 @@ describe('Link', () => {
                 objectProp: { test: true },
             },
         });
-        const node = host.querySelector('a') as HTMLElement;
+        const node = host.querySelector('test-element') as HTMLElement;
         const onStringChange = vi.fn();
         instance.$on('stringchange', onStringChange);
         const onClick = vi.fn((event) => event.preventDefault());
@@ -38,5 +39,13 @@ describe('Link', () => {
         expect(onStringChange).toHaveBeenCalled();
         node.click();
         expect(onClick).toHaveBeenCalled();
+    });
+
+    test('named slot', () => {
+        host = document.createElement('div');
+        host.setAttribute('id', 'host');
+        document.body.appendChild(host);
+        new TestElementRoot({ target: host });
+        expect(host.innerHTML).toMatchSnapshot();
     });
 });

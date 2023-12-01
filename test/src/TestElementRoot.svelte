@@ -1,5 +1,5 @@
 <script>
-    import TestElement from './TestElement.svelte';
+    import TestElement from './svelte/TestElement.svelte';
 </script>
 
 <TestElement>

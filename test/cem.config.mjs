@@ -2,6 +2,6 @@ import { dnaPlugins } from '@chialab/manifest-analyzer-dna-plugin';
 
 export default {
     plugins: dnaPlugins(),
-    globs: ['src/**/*.ts'],
+    globs: ['test/src/**/*.ts'],
     dependencies: false,
 };
