@@ -38,6 +38,7 @@ describe('Link', () => {
             stringProp: 'changed',
         });
         await tick();
+        expect(host.innerHTML).toMatchSnapshot();
         expect(onStringChange).toHaveBeenCalled();
         node.click();
         expect(onClick).toHaveBeenCalled();

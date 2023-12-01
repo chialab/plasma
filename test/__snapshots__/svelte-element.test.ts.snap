@@ -2,4 +2,6 @@
 
 exports[`Element > mount component 1`] = `"<test-element data-attr=\\"test\\" :scope=\\"test-element\\" :defined=\\"\\" stringprop=\\"test\\" booleanprop=\\"\\" numericprop=\\"1\\"> <span class=\\"text\\">test</span><span class=\\"boolean\\">true</span><span class=\\"number\\">1</span><span class=\\"object\\">{\\"test\\":true}</span></test-element>"`;
 
+exports[`Element > mount component 2`] = `"<test-element data-attr=\\"test\\" :scope=\\"test-element\\" :defined=\\"\\" stringprop=\\"changed\\" booleanprop=\\"\\" numericprop=\\"1\\"> <span class=\\"text\\">changed</span><span class=\\"boolean\\">true</span><span class=\\"number\\">1</span><span class=\\"object\\">{\\"test\\":true}</span></test-element>"`;
+
 exports[`Element > named slot 1`] = `"<test-element :scope=\\"test-element\\" :defined=\\"\\">Hello <span class=\\"text\\"></span><span class=\\"number\\"></span><span class=\\"object\\"></span><i slot=\\"icon\\">icon</i></test-element>"`;

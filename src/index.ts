@@ -1,3 +1,4 @@
+import { transformPreact, type PreactTransformOptions } from './preact';
 import { transformReact, type ReactTransformOptions } from './react';
 import { transformSvelte, type SvelteTransformOptions } from './svelte';
 import type { Entry } from './walker';
@@ -10,8 +11,8 @@ export enum Frameworks {
     Vue = 'vue',
 }
 
-export const SUPPORTED = [Frameworks.React, Frameworks.Svelte];
-export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Preact, Frameworks.Vue];
+export const SUPPORTED = [Frameworks.Preact, Frameworks.React, Frameworks.Svelte];
+export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Vue];
 
 export * from './walker';
 export * from './svelte';
@@ -24,13 +25,17 @@ export async function transform<F extends Frameworks>(
         ? SvelteTransformOptions
         : F extends Frameworks.React
           ? ReactTransformOptions
-          : never
+          : F extends Frameworks.Preact
+            ? PreactTransformOptions
+            : never
 ) {
     switch (framework) {
         case Frameworks.Svelte:
             return transformSvelte(entry, options);
         case Frameworks.React:
             return transformReact(entry, options);
+        case Frameworks.Preact:
+            return transformPreact(entry, options);
         default:
             throw new Error(`Unsupported framework: ${framework}`);
     }

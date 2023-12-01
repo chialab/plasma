@@ -62,6 +62,9 @@ jobs:
         with:
           cache: yarn
 
+      - name: Install project dependencies
+        run: yarn install
+
       - name: Fetch build artifacts
         uses: actions/download-artifact@v3
         with:

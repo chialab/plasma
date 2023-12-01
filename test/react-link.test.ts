@@ -47,6 +47,7 @@ describe('Element', () => {
             })
         );
         await awaitReactRender();
+        expect(host.innerHTML).toMatchSnapshot();
         expect(onStringChange).toHaveBeenCalled();
         node.click();
         expect(onClick).toHaveBeenCalled();

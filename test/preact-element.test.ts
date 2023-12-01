@@ -1,7 +1,6 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { h, render } from 'preact';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { TestElement } from './src/react/TestElement';
+import { TestElement } from './src/preact/TestElement';
 
 let host: HTMLElement;
 
@@ -18,25 +17,25 @@ describe('Element', () => {
     });
 
     test('mount component', async () => {
-        const root = createRoot(host);
         const onStringChange = vi.fn();
         const onClick = vi.fn((event) => event.preventDefault());
-        root.render(
-            React.createElement(TestElement, {
+        render(
+            h(TestElement, {
                 'stringProp': 'test',
                 'booleanProp': true,
                 'numericProp': 1,
                 'objectProp': { test: true },
                 'data-attr': 'test',
-            })
+            }),
+            host
         );
         await awaitReactRender();
         const node = host.querySelector('test-element') as HTMLElement;
         expect(host.innerHTML).toMatchSnapshot();
         expect(onStringChange).not.toHaveBeenCalled();
         expect(onClick).not.toHaveBeenCalled();
-        root.render(
-            React.createElement(TestElement, {
+        render(
+            h(TestElement, {
                 'onStringchange': onStringChange,
                 onClick,
                 'stringProp': 'changed',
@@ -44,7 +43,8 @@ describe('Element', () => {
                 'numericProp': 1,
                 'objectProp': { test: true },
                 'data-attr': 'test',
-            })
+            }),
+            host
         );
         await awaitReactRender();
         expect(host.innerHTML).toMatchSnapshot();
@@ -54,14 +54,7 @@ describe('Element', () => {
     });
 
     test('named slot', async () => {
-        const root = createRoot(host);
-        root.render(
-            React.createElement(TestElement, {}, [
-                'Hello',
-                React.createElement('i', { slot: 'icon', key: 'icon' }, 'icon'),
-            ])
-        );
-        await awaitReactRender();
+        render(h(TestElement, {}, ['Hello', h('i', { slot: 'icon', key: 'icon' }, 'icon')]), host);
         expect(host.innerHTML).toMatchSnapshot();
     });
 });
