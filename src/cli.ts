@@ -1,6 +1,6 @@
 #! /usr/bin/env node
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFile, writeFile } from 'node:fs/promises';
+import { basename, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { program } from 'commander';
@@ -28,7 +28,7 @@ const colorFramework = (framework: string) => {
 };
 
 const packageJsonFile = fileURLToPath(new URL('../package.json', import.meta.url));
-const json = JSON.parse(readFileSync(packageJsonFile, 'utf-8'));
+const json = JSON.parse(await readFile(packageJsonFile, 'utf-8'));
 
 program
     .name('plasma')
@@ -36,119 +36,153 @@ program
     .version(json.version)
 
     .argument('[input]', 'source directory')
-    .option('-f, --framework <framework>', 'the framework to convert to')
+    .option('-e, --entrypoint <filename>', 'the module entrypoint filename')
+    .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .requiredOption('-o, --outdir <outdir>', 'output directory')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
 
-    .action(async (sourceDir, options) => {
-        sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
+    .action(
+        async (
+            sourceDir,
+            options: {
+                outdir: string;
+                entrypoint?: string;
+                frameworks?: Frameworks[];
+                yes?: boolean;
+            }
+        ) => {
+            sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
 
-        const input = await packageUp({ cwd: sourceDir });
-        if (!input) {
-            throw new Error('No package.json found');
-        }
+            const input = await packageUp({ cwd: sourceDir });
+            if (!input) {
+                throw new Error('No package.json found');
+            }
 
-        const json = await parsePackageJson(input);
-        const manifest = await parseManifestFromPackage(input, json);
-        if (!manifest) {
-            throw new Error('No custom elements manifest found');
-        }
+            const json = await parsePackageJson(input);
+            const manifest = await parseManifestFromPackage(input, json);
+            if (!manifest) {
+                throw new Error('No custom elements manifest found');
+            }
 
-        const yes = options.yes || !process.stdout.isTTY;
-        const data = Array.from(candidates(json, manifest));
-        let selected: string[];
-        if (yes) {
-            selected = data.map(({ declaration }) => declaration.name);
-        } else {
-            selected = (
-                await prompts({
-                    type: 'multiselect',
-                    name: 'components',
-                    message: 'Select components to convert',
-                    choices: data.map(({ declaration }) => ({
-                        title: declaration.name,
-                        value: declaration.name,
-                        selected: true,
-                    })),
-                    instructions: false,
-                })
-            ).components;
-        }
-
-        let frameworks: Frameworks[];
-        if (yes) {
-            frameworks = SUPPORTED;
-        } else if (options.framework) {
-            frameworks = [options.framework].filter((framework) => SUPPORTED.includes(framework));
-        } else {
-            frameworks = (
-                await prompts({
-                    type: 'multiselect',
-                    name: 'frameworks',
-                    message: 'Select frameworks to convert to',
-                    choices: [
-                        ...SUPPORTED.map((framework) => ({
-                            title: colorFramework(framework),
-                            value: framework,
+            const yes = options.yes || !process.stdout.isTTY;
+            const data = Array.from(candidates(json, manifest));
+            let selected: string[];
+            if (yes) {
+                selected = data.map(({ declaration }) => declaration.name);
+            } else {
+                selected = (
+                    await prompts({
+                        type: 'multiselect',
+                        name: 'components',
+                        message: 'Select components to convert',
+                        choices: data.map(({ declaration }) => ({
+                            title: declaration.name,
+                            value: declaration.name,
                             selected: true,
                         })),
-                        ...UNSUPPORTED.map((framework) => ({
-                            title: colorFramework(framework),
-                            value: framework,
-                            disabled: true,
-                        })),
-                    ],
-                    instructions: false,
-                })
-            ).frameworks;
-        }
-
-        if (!frameworks || frameworks.length === 0) {
-            throw new Error('No frameworks selected');
-        }
-
-        const tasks = new Listr(
-            selected.map((component) => ({
-                title: `Converting ${component}`,
-                task: (ctx, task) =>
-                    task.newListr(
-                        frameworks.map((framework) => ({
-                            title: `Converting ${chalk.whiteBright(component)} to ${colorFramework(framework)}…`,
-                            task: async (ctx, task) => {
-                                const entry = data.find(({ declaration }) => declaration.name === component);
-                                if (!entry) {
-                                    throw new Error(`Component not found: ${component}`);
-                                }
-
-                                const outFile = await transform(entry, framework, {
-                                    outdir: options.outdir.replace(/\[framework\]/g, framework),
-                                });
-                                task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
-                                    framework
-                                )}: ${chalk.grey(outFile)}`;
-                            },
-                        })),
-                        {
-                            concurrent: true,
-                            // @ts-expect-error Listr typings are wrong
-                            rendererOptions: {
-                                collapseSubtasks: false,
-                                persistentOutput: true,
-                            },
-                        }
-                    ),
-            })),
-            {
-                concurrent: true,
-                // @ts-expect-error Listr typings are wrong
-                rendererOptions: {
-                    collapseSubtasks: false,
-                    persistentOutput: true,
-                },
+                        instructions: false,
+                    })
+                ).components;
             }
-        );
 
-        await tasks.run();
-    });
+            let frameworks: Frameworks[];
+            if (options.frameworks?.length) {
+                frameworks = options.frameworks.filter((framework) => SUPPORTED.includes(framework));
+            } else if (yes) {
+                frameworks = SUPPORTED;
+            } else {
+                frameworks = (
+                    await prompts({
+                        type: 'multiselect',
+                        name: 'frameworks',
+                        message: 'Select frameworks to convert to',
+                        choices: [
+                            ...SUPPORTED.map((framework) => ({
+                                title: colorFramework(framework),
+                                value: framework,
+                                selected: true,
+                            })),
+                            ...UNSUPPORTED.map((framework) => ({
+                                title: colorFramework(framework),
+                                value: framework,
+                                disabled: true,
+                            })),
+                        ],
+                        instructions: false,
+                    })
+                ).frameworks;
+            }
+
+            if (!frameworks || frameworks.length === 0) {
+                throw new Error('No frameworks selected');
+            }
+
+            const tasks = new Listr(
+                selected.map((component) => ({
+                    title: `Converting ${component}`,
+                    task: (ctx, task) =>
+                        task.newListr(
+                            frameworks.map((framework) => ({
+                                title: `Converting ${chalk.whiteBright(component)} to ${colorFramework(framework)}…`,
+                                task: async (ctx, task) => {
+                                    const entry = data.find(({ declaration }) => declaration.name === component);
+                                    if (!entry) {
+                                        throw new Error(`Component not found: ${component}`);
+                                    }
+
+                                    const outDir = options.outdir.replace(/\[framework\]/g, framework);
+                                    const outFile = await transform(entry, framework, {
+                                        outdir: outDir,
+                                    });
+                                    if (options.entrypoint) {
+                                        await Promise.all(
+                                            [
+                                                join(outDir, options.entrypoint),
+                                                join(
+                                                    outDir,
+                                                    `${basename(options.entrypoint, extname(options.entrypoint))}.d.ts`
+                                                ),
+                                            ].map(async (entrypoint) =>
+                                                writeFile(
+                                                    entrypoint,
+                                                    [
+                                                        ...(await readFile(entrypoint, 'utf-8').catch(() => ''))
+                                                            .split('\n')
+                                                            .filter(Boolean),
+                                                        `export * from './${relative(outDir, outFile)}';`,
+                                                    ].join('\n')
+                                                )
+                                            )
+                                        );
+                                    }
+                                    task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
+                                        framework
+                                    )}: ${chalk.grey(outFile)}`;
+                                    task.output = outFile;
+                                },
+                            })),
+                            {
+                                concurrent: !options.entrypoint,
+                                // @ts-expect-error Listr typings are wrong
+                                rendererOptions: {
+                                    collapseSubtasks: false,
+                                    persistentOutput: true,
+                                },
+                            }
+                        ),
+                })),
+                {
+                    concurrent: true,
+                    // @ts-expect-error Listr typings are wrong
+                    rendererOptions: {
+                        collapseSubtasks: false,
+                        persistentOutput: true,
+                    },
+                }
+            );
+
+            await tasks.run();
+        }
+    );
 
 program.parse();

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { filterPublicMemebers, isOptionalClassField } from './utils';
+import { filterPublicMemebers } from './utils';
 import type { Entry } from './walker';
 
 export interface SvelteTransformOptions {
@@ -214,9 +214,7 @@ function forwardEvents() {
 
     filterPublicMemebers(declaration).forEach((member) => {
         const setter = `$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`;
-        script += `export let ${member.name} = ${
-            'default' in member ? JSON.parse(member.default as string) : 'undefined'
-        };\n${setter}\n\n`;
+        script += `export let ${member.name};\n${setter}\n\n`;
     });
 
     const slots = [];
@@ -233,16 +231,14 @@ function forwardEvents() {
     use:forwardEvents
     {...$$restProps}
 >
-    <slot />
-    ${slots.join('\n    ')}
+    ${slots.concat(['<slot />']).join('\n    ')}
 </${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
     use:forwardEvents
     {...$$restProps}
 >
-    <slot />
-    ${slots.join('\n    ')}
+    ${slots.concat(['<slot />']).join('\n    ')}
 </${definition.name}>`;
 
     return `<script>
@@ -258,20 +254,17 @@ ${markup}`;
 
 export function generateSvelteTypings(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
-    let imports = `import { SvelteComponent } from 'svelte';
+    const imports = `import { SvelteComponent } from 'svelte';
 import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
 import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
 `;
 
     const propertiesTypings = filterPublicMemebers(declaration).map(
-        (member) =>
-            `${member.name}${isOptionalClassField(member) ? '?' : ''}: Base${declaration.name}['${member.name}'];`
+        (member) => `${member.name}?: Base${declaration.name}['${member.name}'];`
     );
 
     let eventsTypings = '';
     if (declaration.events) {
-        imports += `import { EventHandler } from 'svelte/elements';\n`;
-
         for (const event of declaration.events) {
             eventsTypings += `'${event.name}': CustomEvent;\n`;
         }
@@ -309,11 +302,10 @@ ${slotsTypings
 export type ${declaration.name}Props = typeof __propDef.props;
 export type ${declaration.name}Events = typeof __propDef.events;
 export type ${declaration.name}Slots = typeof __propDef.slots;
-export default class ${declaration.name} extends SvelteComponent<${declaration.name}Props, ${declaration.name}Events, ${
+export class ${declaration.name} extends SvelteComponent<${declaration.name}Props, ${declaration.name}Events, ${
         declaration.name
     }Slots> {
 }
-export {};
 `;
 
     return `${imports}${declContents}`;
@@ -321,14 +313,19 @@ export {};
 
 export async function transformSvelte(entry: Entry, options: SvelteTransformOptions) {
     const { declaration } = entry;
-    const outFile = join(options.outdir, `${declaration.name}.svelte`);
-    const declFile = `${outFile}.d.ts`;
+    const outFile = join(options.outdir, `${declaration.name}.js`);
+    const svelteFile = join(options.outdir, `${declaration.name}.svelte`);
+    const declFile = join(options.outdir, `${declaration.name}.d.ts`);
 
     await mkdir(options.outdir, {
         recursive: true,
     });
     await Promise.all([
-        writeFile(outFile, generateSvelteComponent(entry)),
+        writeFile(
+            outFile,
+            `import ${declaration.name} from './${declaration.name}.svelte';\n\nexport { ${declaration.name} };`
+        ),
+        writeFile(svelteFile, generateSvelteComponent(entry)),
         writeFile(declFile, generateSvelteTypings(entry)),
     ]);
 

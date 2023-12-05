@@ -2,7 +2,7 @@ import esbuild from 'esbuild';
 
 await esbuild.build({
     entryPoints: ['src/index.ts', 'src/cli.ts'],
-    target: 'node14',
+    target: 'node16',
     bundle: true,
     platform: 'node',
     format: 'esm',

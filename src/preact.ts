@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { capitalize, filterPublicMemebers, isOptionalClassField } from './utils';
+import { capitalize, filterPublicMemebers } from './utils';
 import type { Entry } from './walker';
 
 export interface PreactTransformOptions {
@@ -70,8 +70,7 @@ import { ${declaration.name} as Base${declaration.name} } from '${packageJson.na
 `;
 
     const propertiesTypings = filterPublicMemebers(declaration).map(
-        (member) =>
-            `${member.name}${isOptionalClassField(member) ? '?' : ''}: Base${declaration.name}['${member.name}'];`
+        (member) => `${member.name}?: Base${declaration.name}['${member.name}'];`
     );
 
     const eventTypings =
