@@ -4,6 +4,7 @@ await esbuild.build({
     entryPoints: ['src/index.ts', 'src/cli.ts'],
     target: 'node16',
     bundle: true,
+    splitting: true,
     platform: 'node',
     format: 'esm',
     outdir: './dist',

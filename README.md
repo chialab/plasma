@@ -47,14 +47,14 @@ Usage: plasma [options] <input>
 Generate Custom Elements wrappers for Angular, React, Svelte and Vue.
 
 Arguments:
-  input                        source directory
+  input                             source directory
 
 Options:
-  -V, --version                output the version number
-  -f, --framework <framework>  the framework to convert to
-  -o, --outdir <outdir>        output directory
-  -y, --yes                    convert all candidates to all available frameworks
-  -h, --help                   display help for command
+  -V, --version                     output the version number
+  -f, --frameworks <frameworks...>  the framework to convert to
+  -o, --outdir <outdir>             output directory
+  -y, --yes                         convert all candidates to all available frameworks
+  -h, --help                        display help for command
 ```
 
 ---

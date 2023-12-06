@@ -1,6 +1,6 @@
 #! /usr/bin/env node
-import { readFile, writeFile } from 'node:fs/promises';
-import { basename, extname, join, relative, resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { program } from 'commander';
@@ -36,7 +36,6 @@ program
     .version(json.version)
 
     .argument('[input]', 'source directory')
-    .option('-e, --entrypoint <filename>', 'the module entrypoint filename')
     .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .requiredOption('-o, --outdir <outdir>', 'output directory')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
@@ -134,27 +133,6 @@ program
                                     const outFile = await transform(entry, framework, {
                                         outdir: outDir,
                                     });
-                                    if (options.entrypoint) {
-                                        await Promise.all(
-                                            [
-                                                join(outDir, options.entrypoint),
-                                                join(
-                                                    outDir,
-                                                    `${basename(options.entrypoint, extname(options.entrypoint))}.d.ts`
-                                                ),
-                                            ].map(async (entrypoint) =>
-                                                writeFile(
-                                                    entrypoint,
-                                                    [
-                                                        ...(await readFile(entrypoint, 'utf-8').catch(() => ''))
-                                                            .split('\n')
-                                                            .filter(Boolean),
-                                                        `export * from './${relative(outDir, outFile)}';`,
-                                                    ].join('\n')
-                                                )
-                                            )
-                                        );
-                                    }
                                     task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
                                         framework
                                     )}: ${chalk.grey(outFile)}`;
@@ -162,7 +140,7 @@ program
                                 },
                             })),
                             {
-                                concurrent: !options.entrypoint,
+                                concurrent: true,
                                 // @ts-expect-error Listr typings are wrong
                                 rendererOptions: {
                                     collapseSubtasks: false,
