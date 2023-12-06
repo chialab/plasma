@@ -166,55 +166,11 @@ function getAttributes(tagName: string) {
 export function generateSvelteComponent(entry: Entry) {
     const { packageJson, definition, declaration } = entry;
 
-    let script = `import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
-import '${packageJson.name}';
-`;
-
-    script += `
-let __ref;
-let __mounted = false;
-let __component = get_current_component();
-let __boundEvents = [];
-let __listeners = [];
-let __on = __component.$on;
-
-onMount(() => {
-    __mounted = true;
-
-    return () => {
-        __mounted = false;
-    };
-});
-
-__component.$on = (event, ...args) => {
-    if (__mounted) {
-        __listeners.push(listen(__ref, event, forward));
-    } else {
-        __boundEvents.push(event);
-    }
-
-    return __on.call(__component, event, ...args);
-};
-
-function forward(event) {
-    bubble(__component, event);
-}
-
-function forwardEvents() {
-    while (__boundEvents.length) {
-        __listeners.push(listen(__ref, __boundEvents.pop(), forward));
-    }
-
-    return () => {
-        __listeners.forEach((unlisten) => unlisten());
-    };
-}
-
-`;
-
+    const props: string[] = [];
+    const setters: string[] = [];
     filterPublicMemebers(declaration).forEach((member) => {
-        const setter = `$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`;
-        script += `export let ${member.name};\n${setter}\n\n`;
+        props.push(`export let ${member.name} = undefined;`);
+        setters.push(`$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`);
     });
 
     const slots = [];
@@ -223,6 +179,7 @@ function forwardEvents() {
             slots.push(`<slot name="${slot.name}" />`);
         }
     }
+    slots.push('<slot />');
 
     const markup = definition.extend
         ? `<${definition.extend}
@@ -230,23 +187,59 @@ function forwardEvents() {
     is="${definition.name}"
     use:forwardEvents
     {...$$restProps}
->
-    ${slots.concat(['<slot />']).join('\n    ')}
-</${definition.extend}>`
+>${slots.join('')}</${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
     use:forwardEvents
     {...$$restProps}
->
-    ${slots.concat(['<slot />']).join('\n    ')}
-</${definition.name}>`;
+>${slots.join('')}</${definition.name}>`;
 
     return `<script>
-${script
-    .trim()
-    .split('\n')
-    .map((line) => `    ${line}`)
-    .join('\n')}
+    import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
+    import '${packageJson.name}';
+
+    let __ref;
+    let __mounted = false;
+    let __component = get_current_component();
+    let __boundEvents = [];
+    let __listeners = [];
+    let __on = __component.$on;
+
+    onMount(() => {
+        __mounted = true;
+
+        return () => {
+            __mounted = false;
+        };
+    });
+
+    __component.$on = (event, ...args) => {
+        if (__mounted) {
+            __listeners.push(listen(__ref, event, forward));
+        } else {
+            __boundEvents.push(event);
+        }
+
+        return __on.call(__component, event, ...args);
+    };
+
+    function forward(event) {
+        bubble(__component, event);
+    }
+
+    function forwardEvents() {
+        while (__boundEvents.length) {
+            __listeners.push(listen(__ref, __boundEvents.pop(), forward));
+        }
+
+        return () => {
+            __listeners.forEach((unlisten) => unlisten());
+        };
+    }
+
+    ${props.join('\n    ')}
+
+    ${setters.join('\n    ')}
 </script>
 
 ${markup}`;
@@ -263,17 +256,18 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } 
         (member) => `${member.name}?: Base${declaration.name}['${member.name}'];`
     );
 
-    let eventsTypings = '';
+    const eventsTypings = [];
     if (declaration.events) {
         for (const event of declaration.events) {
-            eventsTypings += `'${event.name}': CustomEvent;\n`;
+            eventsTypings.push(`'${event.name}': CustomEvent;`);
         }
     }
+    eventsTypings.push('[key: string]: CustomEvent;');
 
-    let slotsTypings = '';
+    const slotsTypings = [];
     if (declaration.slots) {
         for (const slot of declaration.slots) {
-            slotsTypings += `'${slot.name}': {};\n`;
+            slotsTypings.push(`'${slot.name}': {};`);
         }
     }
 
@@ -283,19 +277,10 @@ declare const __propDef: {
         ${propertiesTypings.join('\n        ')}
     };
     events: {
-${eventsTypings
-    .trim()
-    .split('\n')
-    .map((line) => `        ${line}`)
-    .join('\n')}
-        [key: string]: CustomEvent;
+        ${eventsTypings.join('\n        ')}
     };
     slots: {
-${slotsTypings
-    .trim()
-    .split('\n')
-    .map((line) => `        ${line}`)
-    .join('\n')}
+        ${slotsTypings.join('\n        ')}
     };
 };
 

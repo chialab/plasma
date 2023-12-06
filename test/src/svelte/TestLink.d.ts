@@ -1,7 +1,6 @@
 import { SvelteComponent } from 'svelte';
 import { TestLink as BaseTestLink } from 'plasma-test';
 import { HTMLAnchorAttributes } from 'svelte/elements';
-import { EventHandler } from 'svelte/elements';
 
 declare const __propDef: {
     props: HTMLAnchorAttributes & {
@@ -22,6 +21,5 @@ declare const __propDef: {
 export type TestLinkProps = typeof __propDef.props;
 export type TestLinkEvents = typeof __propDef.events;
 export type TestLinkSlots = typeof __propDef.slots;
-export default class TestLink extends SvelteComponent<TestLinkProps, TestLinkEvents, TestLinkSlots> {
+export class TestLink extends SvelteComponent<TestLinkProps, TestLinkEvents, TestLinkSlots> {
 }
-export {};

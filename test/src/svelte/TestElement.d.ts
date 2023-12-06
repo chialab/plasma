@@ -1,7 +1,6 @@
 import { SvelteComponent } from 'svelte';
 import { TestElement as BaseTestElement } from 'plasma-test';
 import { HTMLAttributes } from 'svelte/elements';
-import { EventHandler } from 'svelte/elements';
 
 declare const __propDef: {
     props: HTMLAttributes<HTMLElement> & {
@@ -22,6 +21,5 @@ declare const __propDef: {
 export type TestElementProps = typeof __propDef.props;
 export type TestElementEvents = typeof __propDef.events;
 export type TestElementSlots = typeof __propDef.slots;
-export default class TestElement extends SvelteComponent<TestElementProps, TestElementEvents, TestElementSlots> {
+export class TestElement extends SvelteComponent<TestElementProps, TestElementEvents, TestElementSlots> {
 }
-export {};

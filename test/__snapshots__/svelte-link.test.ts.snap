@@ -1,5 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Link > mount component 1`] = `"<a is=\\"test-link\\" data-attr=\\"test\\" :scope=\\"test-link\\" :defined=\\"\\" stringprop=\\"test\\" booleanprop=\\"\\" numericprop=\\"1\\"> <span class=\\"text\\">test</span><span class=\\"boolean\\">true</span><span class=\\"number\\">1</span><span class=\\"object\\">{\\"test\\":true}</span></a>"`;
+exports[`Link > mount component 1`] = `"<a is="test-link" data-attr="test" :scope="test-link" :defined="" stringprop="test" booleanprop="" numericprop="1"><span class="text">test</span><span class="boolean">true</span><span class="number">1</span><span class="object">{"test":true}</span></a>"`;
 
-exports[`Link > mount component 2`] = `"<a is=\\"test-link\\" data-attr=\\"test\\" :scope=\\"test-link\\" :defined=\\"\\" stringprop=\\"changed\\" booleanprop=\\"\\" numericprop=\\"1\\"> <span class=\\"text\\">changed</span><span class=\\"boolean\\">true</span><span class=\\"number\\">1</span><span class=\\"object\\">{\\"test\\":true}</span></a>"`;
+exports[`Link > mount component 2`] = `"<a is="test-link" data-attr="test" :scope="test-link" :defined="" stringprop="changed" booleanprop="" numericprop="1"><span class="text">changed</span><span class="boolean">true</span><span class="number">1</span><span class="object">{"test":true}</span></a>"`;

@@ -1,6 +1,6 @@
 import { tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import TestLink from './src/svelte/TestLink.svelte';
+import { TestLink } from './src/svelte/TestLink';
 
 let host: HTMLElement;
 
