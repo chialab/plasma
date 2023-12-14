@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 import { dirname, extname, join } from 'node:path';
-import type { ClassField, CustomElementDeclaration, Package } from 'custom-elements-manifest';
+import type { ClassField, CustomElementDeclaration } from 'custom-elements-manifest';
 
 export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -38,22 +38,22 @@ export async function parseJson(fileName: string) {
     return json;
 }
 
-export async function findManifest(from: string, name = 'custom-elements.json') {
+export async function findJson<T = {}>(from: string, name: string) {
     if (extname(from) === '.json') {
-        return parseJson(from) as Promise<Package>;
+        return parseJson(from) as Promise<T>;
     }
 
     const packageJsonFile = join(from, name);
     try {
         await access(packageJsonFile);
 
-        return parseJson(packageJsonFile) as Promise<Package>;
+        return parseJson(packageJsonFile) as Promise<T>;
     } catch {
         const dir = dirname(from);
         if (dir === from) {
             throw new Error(`No ${name} found`);
         }
 
-        return findManifest(dir, name);
+        return findJson(dir, name);
     }
 }

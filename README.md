@@ -28,10 +28,36 @@ npm i -D @chialab/plasma
 
 ## Usage
 
-Run plasma in the current directory. It will autodetect closest `package.json` to use for wrappers generation.
+Plasma will try to autodetect the custom elements manifest (`custom-elements.json`) and will read the entrypoint from the `package.json` if not specified. The output directory will be `./dist/[framework]` by default.
 
 ```
 npm run plasma
+```
+
+### Other samples
+
+Create cross-framework wrappers for a Web Component library:
+
+```
+npm run plasma --entrypoint @acme/acme-button --outdir './dist/[framework]'
+```
+
+Create wrappers for React and Preact only:
+
+```
+npm run plasma --entrypoint @acme/acme-button --outdir './dist/[framework]' --frameworks react,preact
+```
+
+Create wrappers for Svelte only:
+
+```
+npm run plasma --entrypoint @acme/acme-button --outdir './svelte' --frameworks svelte
+```
+
+Specify custom elements manifest path:
+
+```
+npm run plasma 'dist/custom-elements.json' --entrypoint @acme/acme-button
 ```
 
 ### Options

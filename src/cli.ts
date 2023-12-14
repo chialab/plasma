@@ -1,13 +1,14 @@
 #! /usr/bin/env node
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { program } from 'commander';
+import type { Package } from 'custom-elements-manifest';
 import { Listr } from 'listr2';
 import prompts from 'prompts';
 import { candidates, SUPPORTED, transform, UNSUPPORTED, type Frameworks } from './index';
-import { findManifest } from './utils';
+import { findJson } from './utils';
 
 const colorFramework = (framework: string) => {
     switch (framework) {
@@ -35,8 +36,8 @@ program
     .version(json.version)
 
     .argument('[input]', 'custom elements manifest path')
-    .requiredOption('-e, --entrypoint <path>', 'entrypoint to the package')
-    .requiredOption('-o, --outdir <outdir>', 'output directory')
+    .option('-e, --entrypoint <path>', 'entrypoint to the package')
+    .option('-o, --outdir <outdir>', 'output directory')
     .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
 
@@ -44,17 +45,32 @@ program
         async (
             sourceDir,
             options: {
-                outdir: string;
-                entrypoint: string;
+                entrypoint?: string;
+                outdir?: string;
                 frameworks?: Frameworks[];
                 yes?: boolean;
             }
         ) => {
             sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
 
-            const manifest = await findManifest(sourceDir);
+            const manifest = await findJson<Package>(sourceDir, 'custom-elements.json');
             if (!manifest) {
                 throw new Error('No custom elements manifest found');
+            }
+
+            let entrypoint = options.entrypoint;
+            if (!entrypoint) {
+                try {
+                    const packageDir = extname(sourceDir) ? dirname(sourceDir) : sourceDir;
+                    const packageJson = await findJson<{ name: string }>(packageDir, 'package.json');
+                    entrypoint = packageJson.name;
+                } catch {
+                    //
+                }
+            }
+
+            if (!entrypoint) {
+                throw new Error('No entrypoint found');
             }
 
             const yes = options.yes || !process.stdout.isTTY;
@@ -127,9 +143,12 @@ program
                                         throw new Error(`Component not found: ${component}`);
                                     }
 
-                                    const outDir = options.outdir.replace(/\[framework\]/g, framework);
+                                    const outDir = (options.outdir ?? 'dist/[framework]').replace(
+                                        /\[framework\]/g,
+                                        framework
+                                    );
                                     const outFile = await transform(entry, framework, {
-                                        entrypoint: options.entrypoint,
+                                        entrypoint: entrypoint as string,
                                         outdir: outDir,
                                     });
                                     task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(

@@ -40,7 +40,7 @@
     "build": "yarn clear && tsc --project tsconfig.build.json && node scripts/build.js",
     "lint": "prettier --check . && eslint .",
     "test:manifest": "custom-elements-manifest analyze --config ./test/cem.config.mjs --outdir test",
-    "test:generate": "./dist/cli.js test --entrypoint 'plasma-test' --outdir 'test/src/[framework]' -y",
+    "test:generate": "./dist/cli.js test --outdir 'test/src/[framework]' -y",
     "test": "vitest",
     "prepack": "yarn build && publint"
   },
