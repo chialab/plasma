@@ -5,6 +5,11 @@ import type { Entry } from './walker';
 
 export interface ReactTransformOptions {
     /**
+     * The entrypoint to the package.
+     */
+    entrypoint: string;
+
+    /**
      * The output directory to write the converted components to.
      */
     outdir: string;
@@ -163,8 +168,8 @@ function getAttributes(tagName: string) {
     }
 }
 
-export function generateReactComponent(entry: Entry) {
-    const { packageJson, definition, declaration } = entry;
+export function generateReactComponent(entry: Entry, options: ReactTransformOptions) {
+    const { definition, declaration } = entry;
 
     const props = filterPublicMemebers(declaration).map((member) => member.name);
     const eventProps =
@@ -177,7 +182,7 @@ export function generateReactComponent(entry: Entry) {
         ) ?? {};
 
     return `import React, { useRef, useEffect } from 'react';
-import '${packageJson.name}';
+import '${options.entrypoint}';
 
 const properties = ${JSON.stringify(props)};
 const events = ${JSON.stringify(eventProps)};
@@ -214,11 +219,11 @@ export const ${declaration.name} = ({ children, ...props }) => {
 };`;
 }
 
-export function generateReactTypings(entry: Entry) {
-    const { packageJson, definition, declaration } = entry;
+export function generateReactTypings(entry: Entry, options: ReactTransformOptions) {
+    const { definition, declaration } = entry;
 
     const imports = `import React from 'react';
-import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+import { ${declaration.name} as Base${declaration.name} } from '${options.entrypoint}';
 `;
 
     const propertiesTypings = filterPublicMemebers(declaration).map(
@@ -250,8 +255,8 @@ export async function transformReact(entry: Entry, options: ReactTransformOption
         recursive: true,
     });
     await Promise.all([
-        writeFile(outFile, generateReactComponent(entry)),
-        writeFile(declFile, generateReactTypings(entry)),
+        writeFile(outFile, generateReactComponent(entry, options)),
+        writeFile(declFile, generateReactTypings(entry, options)),
     ]);
 
     return outFile;

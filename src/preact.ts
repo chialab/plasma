@@ -5,13 +5,18 @@ import type { Entry } from './walker';
 
 export interface PreactTransformOptions {
     /**
+     * The entrypoint to the package.
+     */
+    entrypoint: string;
+
+    /**
      * The output directory to write the converted components to.
      */
     outdir: string;
 }
 
-export function generatePreactComponent(entry: Entry) {
-    const { packageJson, definition, declaration } = entry;
+export function generatePreactComponent(entry: Entry, options: PreactTransformOptions) {
+    const { definition, declaration } = entry;
 
     const props = filterPublicMemebers(declaration).map((member) => member.name);
     const eventProps =
@@ -25,7 +30,7 @@ export function generatePreactComponent(entry: Entry) {
 
     return `import { h } from 'preact';
 import { useRef, useEffect } from 'preact/hooks';
-import '${packageJson.name}';
+import '${options.entrypoint}';
 
 const properties = ${JSON.stringify(props)};
 const events = ${JSON.stringify(eventProps)};
@@ -62,11 +67,11 @@ export const ${declaration.name} = ({ children, ...props }) => {
 };`;
 }
 
-export function generatePreactTypings(entry: Entry) {
-    const { packageJson, declaration } = entry;
+export function generatePreactTypings(entry: Entry, options: PreactTransformOptions) {
+    const { declaration } = entry;
 
     const imports = `import { FunctionComponent, JSX } from 'preact';
-import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+import { ${declaration.name} as Base${declaration.name} } from '${options.entrypoint}';
 `;
 
     const propertiesTypings = filterPublicMemebers(declaration).map(
@@ -95,8 +100,8 @@ export async function transformPreact(entry: Entry, options: PreactTransformOpti
         recursive: true,
     });
     await Promise.all([
-        writeFile(outFile, generatePreactComponent(entry)),
-        writeFile(declFile, generatePreactTypings(entry)),
+        writeFile(outFile, generatePreactComponent(entry, options)),
+        writeFile(declFile, generatePreactTypings(entry, options)),
     ]);
 
     return outFile;

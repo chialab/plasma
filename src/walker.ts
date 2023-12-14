@@ -5,10 +5,8 @@ import type {
     JavaScriptModule,
     Package,
 } from 'custom-elements-manifest';
-import type { PackageJson } from './parser';
 
 export interface Entry {
-    packageJson: PackageJson;
     manifest: Package;
     module: JavaScriptModule;
     definition: CustomElementExport & { extend?: string };
@@ -19,7 +17,7 @@ function isCustomElementDeclaration(declaration: Declaration): declaration is Cu
     return declaration.kind === 'class' && 'customElement' in declaration;
 }
 
-export function* candidates(packageJson: PackageJson, manifest: Package): Generator<Entry> {
+export function* candidates(manifest: Package): Generator<Entry> {
     for (const module of manifest.modules) {
         if (module.exports) {
             for (const export_ of module.exports) {
@@ -34,7 +32,7 @@ export function* candidates(packageJson: PackageJson, manifest: Package): Genera
                         if (declaration.tagName !== export_.name) {
                             continue;
                         }
-                        yield { packageJson, manifest, module, definition: export_, declaration };
+                        yield { manifest, module, definition: export_, declaration };
                     }
                 }
             }

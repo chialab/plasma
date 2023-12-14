@@ -5,10 +5,9 @@ import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { Listr } from 'listr2';
-import { packageUp } from 'package-up';
 import prompts from 'prompts';
 import { candidates, SUPPORTED, transform, UNSUPPORTED, type Frameworks } from './index';
-import { parseManifestFromPackage, parsePackageJson } from './parser';
+import { findManifest } from './utils';
 
 const colorFramework = (framework: string) => {
     switch (framework) {
@@ -35,9 +34,10 @@ program
     .description(json.description)
     .version(json.version)
 
-    .argument('[input]', 'source directory')
-    .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
+    .argument('[input]', 'custom elements manifest path')
+    .requiredOption('-e, --entrypoint <path>', 'entrypoint to the package')
     .requiredOption('-o, --outdir <outdir>', 'output directory')
+    .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
 
     .action(
@@ -45,26 +45,20 @@ program
             sourceDir,
             options: {
                 outdir: string;
-                entrypoint?: string;
+                entrypoint: string;
                 frameworks?: Frameworks[];
                 yes?: boolean;
             }
         ) => {
             sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
 
-            const input = await packageUp({ cwd: sourceDir });
-            if (!input) {
-                throw new Error('No package.json found');
-            }
-
-            const json = await parsePackageJson(input);
-            const manifest = await parseManifestFromPackage(input, json);
+            const manifest = await findManifest(sourceDir);
             if (!manifest) {
                 throw new Error('No custom elements manifest found');
             }
 
             const yes = options.yes || !process.stdout.isTTY;
-            const data = Array.from(candidates(json, manifest));
+            const data = Array.from(candidates(manifest));
             if (data.length === 0) {
                 throw new Error('No components found');
             }
@@ -135,6 +129,7 @@ program
 
                                     const outDir = options.outdir.replace(/\[framework\]/g, framework);
                                     const outFile = await transform(entry, framework, {
+                                        entrypoint: options.entrypoint,
                                         outdir: outDir,
                                     });
                                     task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(

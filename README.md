@@ -18,10 +18,7 @@ Generate Custom Elements wrappers for Angular, React, Svelte and Vue.
 
 Plasma transformations are based on [Custom Element Manifest](https://github.com/webcomponents/custom-elements-manifest) (CEM) specifications. The CEM is a JSON files that describes a Custom Element, its properties, events and slots. Plasma uses the CEM to generate wrappers for the supported frameworks.
 
-In order to run the `plasma` cli you need:
-
--   a `package.json` file. Plasma uses the `name` field to import the Custom Element definition and the `customElements` field to detect the CEM file;
--   a CEM file. You can generate the CEM for most of the Web Components library using this [Analyzer](https://github.com/open-wc/custom-elements-manifest/tree/master/packages/analyzer).
+You can generate the CEM for most of the Web Components library using this [Analyzer](https://github.com/open-wc/custom-elements-manifest/tree/master/packages/analyzer).
 
 ## Installation
 
@@ -40,19 +37,18 @@ npm run plasma
 ### Options
 
 ```
-npm run plasma --help
-
 Usage: plasma [options] <input>
 
 Generate Custom Elements wrappers for Angular, React, Svelte and Vue.
 
 Arguments:
-  input                             source directory
+  input                             custom elements manifest path
 
 Options:
   -V, --version                     output the version number
-  -f, --frameworks <frameworks...>  the framework to convert to
+  -e, --entrypoint <path>           entrypoint to the package
   -o, --outdir <outdir>             output directory
+  -f, --frameworks <frameworks...>  the framework to convert to
   -y, --yes                         convert all candidates to all available frameworks
   -h, --help                        display help for command
 ```

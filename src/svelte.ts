@@ -5,6 +5,11 @@ import type { Entry } from './walker';
 
 export interface SvelteTransformOptions {
     /**
+     * The entrypoint to the package.
+     */
+    entrypoint: string;
+
+    /**
      * The output directory to write the converted components to.
      */
     outdir: string;
@@ -163,8 +168,8 @@ function getAttributes(tagName: string) {
     }
 }
 
-export function generateSvelteComponent(entry: Entry) {
-    const { packageJson, definition, declaration } = entry;
+export function generateSvelteComponent(entry: Entry, options: SvelteTransformOptions) {
+    const { definition, declaration } = entry;
 
     const props: string[] = [];
     const setters: string[] = [];
@@ -196,7 +201,7 @@ export function generateSvelteComponent(entry: Entry) {
 
     return `<script>
     import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
-    import '${packageJson.name}';
+    import '${options.entrypoint}';
 
     let __ref;
     let __mounted = false;
@@ -245,10 +250,10 @@ export function generateSvelteComponent(entry: Entry) {
 ${markup}`;
 }
 
-export function generateSvelteTypings(entry: Entry) {
-    const { packageJson, definition, declaration } = entry;
+export function generateSvelteTypings(entry: Entry, options: SvelteTransformOptions) {
+    const { definition, declaration } = entry;
     const imports = `import { SvelteComponent } from 'svelte';
-import { ${declaration.name} as Base${declaration.name} } from '${packageJson.name}';
+import { ${declaration.name} as Base${declaration.name} } from '${options.entrypoint}';
 import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
 `;
 
@@ -310,8 +315,8 @@ export async function transformSvelte(entry: Entry, options: SvelteTransformOpti
             outFile,
             `import ${declaration.name} from './${declaration.name}.svelte';\n\nexport { ${declaration.name} };`
         ),
-        writeFile(svelteFile, generateSvelteComponent(entry)),
-        writeFile(declFile, generateSvelteTypings(entry)),
+        writeFile(svelteFile, generateSvelteComponent(entry, options)),
+        writeFile(declFile, generateSvelteTypings(entry, options)),
     ]);
 
     return outFile;
