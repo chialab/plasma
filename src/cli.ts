@@ -65,6 +65,10 @@ program
 
             const yes = options.yes || !process.stdout.isTTY;
             const data = Array.from(candidates(json, manifest));
+            if (data.length === 0) {
+                throw new Error('No components found');
+            }
+
             let selected: string[];
             if (yes) {
                 selected = data.map(({ declaration }) => declaration.name);
