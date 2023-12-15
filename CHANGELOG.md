@@ -1,5 +1,16 @@
 # @chialab/plasma
 
+## 0.2.0
+
+### Minor Changes
+
+-   725c6b4: Do not require a package.json anymore.
+-   51d3b64: Support `stdin` manifest.
+
+### Patch Changes
+
+-   ad1927f: Add check for missing components.
+
 ## 0.1.1
 
 ### Patch Changes
