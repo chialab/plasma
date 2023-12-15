@@ -8,7 +8,7 @@ import type { Package } from 'custom-elements-manifest';
 import { Listr } from 'listr2';
 import prompts from 'prompts';
 import { candidates, SUPPORTED, transform, UNSUPPORTED, type Frameworks } from './index';
-import { findJson } from './utils';
+import { findJson, validateManifest } from './utils';
 
 const colorFramework = (framework: string) => {
     switch (framework) {
@@ -29,6 +29,7 @@ const colorFramework = (framework: string) => {
 
 const packageJsonFile = fileURLToPath(new URL('../package.json', import.meta.url));
 const json = JSON.parse(await readFile(packageJsonFile, 'utf-8'));
+let stdin = '';
 
 program
     .name('plasma')
@@ -51,12 +52,19 @@ program
                 yes?: boolean;
             }
         ) => {
-            sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
+            let manifest: Package;
+            if (stdin) {
+                manifest = JSON.parse(stdin);
+            } else {
+                sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
 
-            const manifest = await findJson<Package>(sourceDir, 'custom-elements.json');
+                manifest = await findJson<Package>(sourceDir, 'custom-elements.json');
+            }
             if (!manifest) {
                 throw new Error('No custom elements manifest found');
             }
+
+            validateManifest(manifest);
 
             let entrypoint = options.entrypoint;
             if (!entrypoint) {
@@ -181,4 +189,16 @@ program
         }
     );
 
-program.parse();
+if (process.stdin.isTTY) {
+    program.parse(process.argv);
+} else {
+    process.stdin.on('readable', () => {
+        let chunk: string;
+        while ((chunk = process.stdin.read()) !== null) {
+            stdin += chunk.toString();
+        }
+    });
+    process.stdin.on('end', () => {
+        program.parse(process.argv);
+    });
+}

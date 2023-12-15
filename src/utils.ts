@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 import { dirname, extname, join } from 'node:path';
-import type { ClassField, CustomElementDeclaration } from 'custom-elements-manifest';
+import type { ClassField, CustomElementDeclaration, Package } from 'custom-elements-manifest';
 
 export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -55,5 +55,20 @@ export async function findJson<T = {}>(from: string, name: string) {
         }
 
         return findJson(dir, name);
+    }
+}
+
+export function validateManifest(manifest: Package) {
+    if (!manifest.schemaVersion) {
+        throw new Error('Malformed custom elements manifest: missing schemaVersion field');
+    }
+    if (typeof manifest.schemaVersion !== 'string') {
+        throw new Error('Malformed custom elements manifest: schemaVersion is not a string');
+    }
+    if (manifest.modules == null) {
+        throw new Error('Malformed custom elements manifest: missing modules field');
+    }
+    if (!Array.isArray(manifest.modules)) {
+        throw new Error('Malformed custom elements manifest: modules is not an array');
     }
 }
