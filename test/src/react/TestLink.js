@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import 'plasma-test';
 
-const properties = ["stringProp","booleanProp","numericProp","objectProp"];
+const properties = ["stringProp","booleanProp","numericProp","objectProp","defaultValue"];
 const events = {"onStringchange":"stringchange"};
 
 export const TestLink = ({ children, ...props }) => {
@@ -11,6 +11,7 @@ export const TestLink = ({ children, ...props }) => {
         booleanProp,
         numericProp,
         objectProp,
+        defaultValue,
         onStringchange,
         ...restProps
     } = props;

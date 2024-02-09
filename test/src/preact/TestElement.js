@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { useRef, useEffect } from 'preact/hooks';
 import 'plasma-test';
 
-const properties = ["stringProp","booleanProp","numericProp","objectProp"];
+const properties = ["stringProp","booleanProp","numericProp","objectProp","defaultValue"];
 const events = {"onStringchange":"stringchange"};
 
 export const TestElement = ({ children, ...props }) => {
@@ -12,6 +12,7 @@ export const TestElement = ({ children, ...props }) => {
         booleanProp,
         numericProp,
         objectProp,
+        defaultValue,
         onStringchange,
         ...restProps
     } = props;

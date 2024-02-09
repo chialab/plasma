@@ -6,6 +6,7 @@ export const TestElement: FunctionComponent<JSX.HTMLAttributes<BaseTestElement> 
     booleanProp?: BaseTestElement['booleanProp'];
     numericProp?: BaseTestElement['numericProp'];
     objectProp?: BaseTestElement['objectProp'];
+    defaultValue?: BaseTestElement['defaultValue'];
     onStringchange?: (this: BaseTestElement, event: CustomEvent) => boolean;
     [key: `data-${string}`]: any;
 }>;

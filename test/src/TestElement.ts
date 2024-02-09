@@ -16,6 +16,8 @@ export class TestElement extends Component {
     numericProp?: number;
     @property()
     objectProp?: object;
+    @property()
+    defaultValue = 0;
 
     render() {
         return html`

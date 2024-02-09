@@ -44,6 +44,14 @@
               "type": {
                 "text": "object | undefined"
               }
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
             }
           ],
           "events": [
@@ -120,6 +128,14 @@
               "type": {
                 "text": "object | undefined"
               }
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
             }
           ],
           "events": [

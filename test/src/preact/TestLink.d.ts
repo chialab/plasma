@@ -6,6 +6,7 @@ export const TestLink: FunctionComponent<JSX.HTMLAttributes<BaseTestLink> & {
     booleanProp?: BaseTestLink['booleanProp'];
     numericProp?: BaseTestLink['numericProp'];
     objectProp?: BaseTestLink['objectProp'];
+    defaultValue?: BaseTestLink['defaultValue'];
     onStringchange?: (this: BaseTestLink, event: CustomEvent) => boolean;
     [key: `data-${string}`]: any;
 }>;

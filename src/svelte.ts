@@ -171,12 +171,7 @@ function getAttributes(tagName: string) {
 export function generateSvelteComponent(entry: Entry, options: SvelteTransformOptions) {
     const { definition, declaration } = entry;
 
-    const props: string[] = [];
-    const setters: string[] = [];
-    filterPublicMemebers(declaration).forEach((member) => {
-        props.push(`export let ${member.name} = undefined;`);
-        setters.push(`$: __ref && __mounted && Object.assign(__ref, { ${member.name} });`);
-    });
+    const props = filterPublicMemebers(declaration).map((member) => member.name);
 
     const slots = [];
     if (declaration.slots) {
@@ -190,12 +185,12 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
         ? `<${definition.extend}
     bind:this={__ref}
     is="${definition.name}"
-    use:forwardEvents
+    use:__forwardEvents
     {...$$restProps}
 >${slots.join('')}</${definition.extend}>`
         : `<${definition.name}
     bind:this={__ref}
-    use:forwardEvents
+    use:__forwardEvents
     {...$$restProps}
 >${slots.join('')}</${definition.name}>`;
 
@@ -209,6 +204,9 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     let __boundEvents = [];
     let __listeners = [];
     let __on = __component.$on;
+    let __state = {
+        ${props.map((propName) => `'${propName}': undefined,`).join('\n        ')}
+    };
 
     onMount(() => {
         __mounted = true;
@@ -220,7 +218,7 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
 
     __component.$on = (event, ...args) => {
         if (__mounted) {
-            __listeners.push(listen(__ref, event, forward));
+            __listeners.push(listen(__ref, event, __forward));
         } else {
             __boundEvents.push(event);
         }
@@ -228,13 +226,21 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
         return __on.call(__component, event, ...args);
     };
 
-    function forward(event) {
+    function __assign(props) {
+        for (const key in props) {
+            if (props[key] !== undefined || __state[key] !== undefined) {
+                __state[key] = __ref[key] = props[key];
+            }
+        }
+    }
+
+    function __forward(event) {
         bubble(__component, event);
     }
 
-    function forwardEvents() {
+    function __forwardEvents() {
         while (__boundEvents.length) {
-            __listeners.push(listen(__ref, __boundEvents.pop(), forward));
+            __listeners.push(listen(__ref, __boundEvents.pop(), __forward));
         }
 
         return () => {
@@ -242,9 +248,11 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
         };
     }
 
-    ${props.join('\n    ')}
+    ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}
 
-    ${setters.join('\n    ')}
+    $: __ref && __mounted && __assign({
+        ${props.map((propName) => `${propName},`).join('\n        ')}
+    });
 </script>
 
 ${markup}`;

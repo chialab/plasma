@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { TestElement } from './src/react/TestElement';
+import type { TestElement as HTMLTestElement } from './src/TestElement';
 
 let host: HTMLElement;
 
@@ -31,7 +32,13 @@ describe('Element', () => {
             })
         );
         await awaitReactRender();
-        const node = host.querySelector('test-element') as HTMLElement;
+        const node = host.querySelector('test-element') as HTMLTestElement;
+        expect(node.stringProp).toBe('test');
+        expect(node.booleanProp).toBe(true);
+        expect(node.numericProp).toBe(1);
+        expect(node.objectProp).toEqual({ test: true });
+        expect(node.defaultValue).toBe(0);
+        expect(node.getAttribute('data-attr')).toBe('test');
         expect(host.innerHTML).toMatchSnapshot();
         expect(onStringChange).not.toHaveBeenCalled();
         expect(onClick).not.toHaveBeenCalled();

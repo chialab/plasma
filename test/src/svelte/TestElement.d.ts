@@ -8,6 +8,7 @@ declare const __propDef: {
         booleanProp?: BaseTestElement['booleanProp'];
         numericProp?: BaseTestElement['numericProp'];
         objectProp?: BaseTestElement['objectProp'];
+        defaultValue?: BaseTestElement['defaultValue'];
     };
     events: {
         'stringchange': CustomEvent;

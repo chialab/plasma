@@ -18,6 +18,8 @@ export class TestLink extends HTML.Anchor {
     numericProp?: number;
     @property()
     objectProp?: object;
+    @property()
+    defaultValue = 0;
 
     render() {
         return html`
