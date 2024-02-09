@@ -37,7 +37,7 @@ program
     .version(json.version)
 
     .argument('[input]', 'custom elements manifest path')
-    .option('-e, --entrypoint <path>', 'entrypoint to the package')
+    .option('-e, --entrypoint <path>', 'module entrypoint')
     .option('-o, --outdir <outdir>', 'output directory')
     .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
@@ -57,7 +57,6 @@ program
                 manifest = JSON.parse(stdin);
             } else {
                 sourceDir = sourceDir ? resolve(sourceDir) : process.cwd();
-
                 manifest = await findJson<Package>(sourceDir, 'custom-elements.json');
             }
             if (!manifest) {

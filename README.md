@@ -72,7 +72,7 @@ Arguments:
 
 Options:
   -V, --version                     output the version number
-  -e, --entrypoint <path>           entrypoint to the package
+  -e, --entrypoint <path>           module entrypoint
   -o, --outdir <outdir>             output directory
   -f, --frameworks <frameworks...>  the framework to convert to
   -y, --yes                         convert all candidates to all available frameworks

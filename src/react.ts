@@ -5,7 +5,7 @@ import type { Entry } from './walker';
 
 export interface ReactTransformOptions {
     /**
-     * The entrypoint to the package.
+     * The module entrypoint.
      */
     entrypoint: string;
 

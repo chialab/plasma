@@ -37,7 +37,8 @@
   "license": "MIT",
   "scripts": {
     "clear": "rimraf 'dist' 'types' 'tsconfig.tsbuildinfo'",
-    "build": "yarn clear && tsc --project tsconfig.build.json && node scripts/build.js",
+    "build": "yarn clear && yarn types && node scripts/build.js",
+    "types": "tsc --project tsconfig.build.json",
     "lint": "prettier --check . && eslint .",
     "test:manifest": "custom-elements-manifest analyze --config ./test/cem.config.mjs --outdir test",
     "test:generate": "./dist/cli.js test --outdir 'test/src/[framework]' -y",
@@ -45,7 +46,7 @@
     "prepack": "yarn build && publint"
   },
   "dependencies": {
-    "type-fest": "^4.8.2"
+    "custom-elements-manifest": "^2.0.0"
   },
   "devDependencies": {
     "@changesets/cli": "^2.22.0",
@@ -59,11 +60,10 @@
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
     "chalk": "^5.3.0",
-    "commander": "^11.1.0",
-    "custom-elements-manifest": "^2.0.0",
-    "esbuild": "^0.19.8",
+    "commander": "^12.0.0",
+    "esbuild": "^0.20.0",
     "eslint": "^8.0.0",
-    "jsdom": "^23.0.0",
+    "jsdom": "^24.0.0",
     "listr2": "^7.0.2",
     "preact": "^10.19.2",
     "prettier": "^3.0.0",
