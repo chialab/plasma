@@ -6,15 +6,12 @@
     "emitDeclarationOnly": true,
     "declarationDir": "types",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "paths": {
-      "plasma-test": ["./test/src/index.ts"]
-    }
+    "experimentalDecorators": true
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": ["src/**/*"]
 }

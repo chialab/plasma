@@ -38,7 +38,7 @@
   "scripts": {
     "clear": "rimraf 'dist' 'types' 'tsconfig.tsbuildinfo'",
     "build": "yarn clear && yarn types && node scripts/build.js",
-    "types": "tsc --project tsconfig.build.json",
+    "types": "tsc",
     "lint": "prettier --check . && eslint .",
     "test:manifest": "custom-elements-manifest analyze --config ./test/cem.config.mjs --outdir test",
     "test:generate": "./dist/cli.js test --outdir 'test/src/[framework]' -y",
