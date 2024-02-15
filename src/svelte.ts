@@ -176,7 +176,9 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     const slots = [];
     if (declaration.slots) {
         for (const slot of declaration.slots) {
-            slots.push(`<slot name="${slot.name}" />`);
+            if (slot.name) {
+                slots.push(`<slot name="${slot.name}" />`);
+            }
         }
     }
     slots.push('<slot />');
@@ -280,7 +282,9 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } 
     const slotsTypings = [];
     if (declaration.slots) {
         for (const slot of declaration.slots) {
-            slotsTypings.push(`'${slot.name}': {};`);
+            if (slot.name) {
+                slotsTypings.push(`'${slot.name}': {};`);
+            }
         }
     }
 
