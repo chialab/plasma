@@ -22,17 +22,10 @@ jobs:
       - name: Install project dependencies
         run: yarn install
 
-      - name: Build package
-        run: yarn tsc
-
-      - name: Lint package
-        run: yarn publint
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          version: yarn changeset version
           publish: yarn changeset publish
           createGithubReleases: true
         env:
