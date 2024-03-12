@@ -1,9 +1,12 @@
-# Plasma
+# Get started
 
 Generate Custom Elements wrappers for Angular, React, Svelte and Vue.
 
-> [!NOTE]  
-> `plasma` is the imperative form for the Italian verb _plasmare_, _to shape_ in English.
+::: info
+
+`plasma` is the imperative form for the Italian verb _plasmare_, _to shape_ in English.
+
+:::
 
 Plasma transformations are based on [Custom Element Manifest](https://github.com/webcomponents/custom-elements-manifest) (CEM) specifications. The CEM is a JSON files that describes a Custom Element, its properties, events and slots. Plasma uses the CEM to generate wrappers for the supported frameworks.
 
@@ -11,9 +14,23 @@ You can generate the CEM for most of the Web Components library using this [Anal
 
 ## Install
 
+Plasma is published to the NPM registry
+
+::: code-group
+
+```bash [npm]
+npm install @chialab/plasma -D
 ```
-npm i -D @chialab/plasma
+
+```bash [yarn]
+yarn add @chialab/plasma -D
 ```
+
+```bash [pnpm]
+pnpm add @chialab/plasma -D
+```
+
+:::
 
 ## Usage
 
@@ -22,14 +39,3 @@ Plasma will try to autodetect the custom elements manifest (`custom-elements.jso
 ```
 npm run plasma
 ```
-
-## Documentation
-
--   [Get started](https://chialab.github.io/plasma/docs/guide)
--   [Options](https://chialab.github.io/plasma/docs/guide/options)
-
----
-
-## License
-
-**Plasma** is released under the [MIT](https://github.com/chialab/plasma/blob/main/LICENSE) license.

@@ -5,6 +5,7 @@ import type { Entry } from './walker';
 
 export enum Frameworks {
     Angular = 'angular',
+    Astro = 'astro',
     Preact = 'preact',
     React = 'react',
     Svelte = 'svelte',
@@ -12,7 +13,7 @@ export enum Frameworks {
 }
 
 export const SUPPORTED = [Frameworks.Preact, Frameworks.React, Frameworks.Svelte];
-export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Vue];
+export const UNSUPPORTED = [Frameworks.Angular, Frameworks.Astro, Frameworks.Vue];
 
 export * from './walker';
 export * from './svelte';

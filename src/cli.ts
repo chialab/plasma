@@ -20,6 +20,8 @@ const colorFramework = (framework: string) => {
             return chalk.cyanBright(framework);
         case 'react':
             return chalk.blueBright(framework);
+        case 'astro':
+            return chalk.yellow(framework);
         case 'vue':
             return chalk.green(framework);
         default:

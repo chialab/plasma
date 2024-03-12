@@ -13,3 +13,5 @@ package-lock.json
 yarn.lock
 
 /test/src/**/*
+docs/.vitepress/dist
+docs/.vitepress/cache
