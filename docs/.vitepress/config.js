@@ -28,6 +28,15 @@ export default defineConfig({
                 link: '/guide/',
             },
             {
+                text: 'Ecosystem',
+                items: [
+                    { text: 'DNA', link: 'https://chialab.github.io/dna/' },
+                    { text: 'Quantum', link: 'https://chialab.github.io/quantum/' },
+                    { text: 'Loock', link: 'https://chialab.github.io/loock/' },
+                    { text: 'Synapse', link: 'https://github.com/chialab/synapse/' },
+                ],
+            },
+            {
                 text: 'Chialab.io',
                 link: 'https://www.chialab.io',
             },
