@@ -10,7 +10,7 @@ hero:
     tagline: 'Generate Custom Elements wrappers for Angular, React, Svelte and Vue'
     actions:
         - theme: brand
-          text: npm i @chialab/plasma
+          text: Get started
           link: /guide/
 features:
     - title: Interoperable
