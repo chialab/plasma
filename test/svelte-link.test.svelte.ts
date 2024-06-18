@@ -1,9 +1,10 @@
-import { tick } from 'svelte';
+import { mount, tick, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { TestLink } from './src/svelte/TestLink';
 import type { TestLink as HTMLTestLink } from './src/TestLink';
 
 let host: HTMLElement;
+let instance: Record<string, unknown>;
 
 describe('Link', () => {
     beforeEach(() => {
@@ -12,19 +13,27 @@ describe('Link', () => {
     });
 
     afterEach(() => {
+        if (instance) {
+            unmount(instance);
+        }
         host.remove();
     });
 
     test('mount component', async () => {
-        const instance = new TestLink({
+        const onClick = vi.fn((event) => event.preventDefault());
+        const onStringChange = vi.fn();
+        const props = $state({
+            'stringProp': 'test',
+            'booleanProp': true,
+            'numericProp': 1,
+            'objectProp': { test: true },
+            'data-attr': 'test',
+            'onclick': (event: Event) => {},
+            'onstringchange': () => {},
+        });
+        instance = mount(TestLink, {
             target: host,
-            props: {
-                'stringProp': 'test',
-                'booleanProp': true,
-                'numericProp': 1,
-                'objectProp': { test: true },
-                'data-attr': 'test',
-            },
+            props,
         });
         const node = host.querySelector('a') as HTMLTestLink;
         expect(node.stringProp).toBe('test');
@@ -33,21 +42,16 @@ describe('Link', () => {
         expect(node.objectProp).toEqual({ test: true });
         expect(node.defaultValue).toBe(0);
         expect(node.getAttribute('data-attr')).toBe('test');
-        const onStringChange = vi.fn();
-        instance.$on('stringchange', onStringChange);
-        const onClick = vi.fn((event) => event.preventDefault());
-        instance.$on('click', onClick);
-        expect(instance).toBeTruthy();
         expect(host.innerHTML).toMatchSnapshot();
         expect(onStringChange).not.toHaveBeenCalled();
         expect(onClick).not.toHaveBeenCalled();
-        instance.$$set({
-            stringProp: 'changed',
-        });
+        props.onclick = onClick;
+        props.onstringchange = onStringChange;
+        props.stringProp = 'changed';
         await tick();
         expect(host.innerHTML).toMatchSnapshot();
-        expect(onStringChange).toHaveBeenCalled();
+        expect(onStringChange).toHaveBeenCalledOnce();
         node.click();
-        expect(onClick).toHaveBeenCalled();
+        expect(onClick).toHaveBeenCalledOnce();
     });
 });

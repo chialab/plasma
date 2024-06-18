@@ -1,26 +1,12 @@
-import { SvelteComponent } from 'svelte';
+import { Component } from 'svelte';
 import { TestLink as BaseTestLink } from 'plasma-test';
 import { HTMLAnchorAttributes } from 'svelte/elements';
 
-declare const __propDef: {
-    props: HTMLAnchorAttributes & {
-        stringProp?: BaseTestLink['stringProp'];
-        booleanProp?: BaseTestLink['booleanProp'];
-        numericProp?: BaseTestLink['numericProp'];
-        objectProp?: BaseTestLink['objectProp'];
-        defaultValue?: BaseTestLink['defaultValue'];
-    };
-    events: {
-        'stringchange': CustomEvent;
-        [key: string]: CustomEvent;
-    };
-    slots: {
-        'icon': {};
-    };
-};
-
-export type TestLinkProps = typeof __propDef.props;
-export type TestLinkEvents = typeof __propDef.events;
-export type TestLinkSlots = typeof __propDef.slots;
-export class TestLink extends SvelteComponent<TestLinkProps, TestLinkEvents, TestLinkSlots> {
-}
+export declare const TestLink: Component<HTMLAnchorAttributes & {
+    stringProp?: BaseTestLink['stringProp'];
+    booleanProp?: BaseTestLink['booleanProp'];
+    numericProp?: BaseTestLink['numericProp'];
+    objectProp?: BaseTestLink['objectProp'];
+    defaultValue?: BaseTestLink['defaultValue'];
+    [`on${string}`]: (event: Event) => void;
+}>;

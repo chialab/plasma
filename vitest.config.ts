@@ -10,7 +10,13 @@ export default defineConfig({
         },
     },
     test: {
+        include: ['test/**/*.test.ts', 'test/**/*.test.svelte.ts'],
         globals: true,
-        environment: 'jsdom',
+        browser: {
+            name: 'chromium',
+            enabled: true,
+            headless: true,
+            provider: 'playwright',
+        },
     },
 });

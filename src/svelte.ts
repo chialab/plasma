@@ -170,9 +170,7 @@ function getAttributes(tagName: string) {
 
 export function generateSvelteComponent(entry: Entry, options: SvelteTransformOptions) {
     const { definition, declaration } = entry;
-
     const props = filterPublicMemebers(declaration).map((member) => member.name);
-
     const slots = [];
     if (declaration.slots) {
         for (const slot of declaration.slots) {
@@ -184,76 +182,42 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     slots.push('<slot />');
 
     const markup = definition.extend
-        ? `<${definition.extend}
+        ? `<!-- svelte-ignore avoid-is -->
+<!-- svelte-ignore a11y-missing-attribute -->
+<${definition.extend}
     bind:this={__ref}
+    {...props}
     is="${definition.name}"
-    use:__forwardEvents
-    {...$$restProps}
 >${slots.join('')}</${definition.extend}>`
-        : `<${definition.name}
+        : `<!-- svelte-ignore a11y-missing-attribute -->
+<${definition.name}
     bind:this={__ref}
-    use:__forwardEvents
-    {...$$restProps}
+    {...props}
 >${slots.join('')}</${definition.name}>`;
 
     return `<script>
-    import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
     import '${options.entrypoint}';
 
     let __ref;
-    let __mounted = false;
-    let __component = get_current_component();
-    let __boundEvents = [];
-    let __listeners = [];
-    let __on = __component.$on;
-    let __state = {
-        ${props.map((propName) => `'${propName}': undefined,`).join('\n        ')}
-    };
-
-    onMount(() => {
-        __mounted = true;
-
-        return () => {
-            __mounted = false;
-        };
-    });
-
-    __component.$on = (event, ...args) => {
-        if (__mounted) {
-            __listeners.push(listen(__ref, event, __forward));
-        } else {
-            __boundEvents.push(event);
-        }
-
-        return __on.call(__component, event, ...args);
-    };
+    let __state = {};
+    let {
+        ${props.join(',\n        ')},
+        ...props
+    } = $props();
 
     function __assign(props) {
         for (const key in props) {
             if (props[key] !== undefined || __state[key] !== undefined) {
-                __state[key] = __ref[key] = props[key];
+                __state[key] = props[key];
+                __ref[key] = props[key];
             }
         }
     }
 
-    function __forward(event) {
-        bubble(__component, event);
-    }
-
-    function __forwardEvents() {
-        while (__boundEvents.length) {
-            __listeners.push(listen(__ref, __boundEvents.pop(), __forward));
-        }
-
-        return () => {
-            __listeners.forEach((unlisten) => unlisten());
-        };
-    }
-
-    ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}
-
-    $: __ref && __mounted && __assign({
-        ${props.map((propName) => `${propName},`).join('\n        ')}
+    $effect(() => {
+        __assign({
+            ${props.map((propName) => `${propName},`).join('\n            ')}
+        });
     });
 </script>
 
@@ -262,7 +226,7 @@ ${markup}`;
 
 export function generateSvelteTypings(entry: Entry, options: SvelteTransformOptions) {
     const { definition, declaration } = entry;
-    const imports = `import { SvelteComponent } from 'svelte';
+    const imports = `import { Component } from 'svelte';
 import { ${declaration.name} as Base${declaration.name} } from '${options.entrypoint}';
 import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
 `;
@@ -271,43 +235,11 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } 
         (member) => `${member.name}?: Base${declaration.name}['${member.name}'];`
     );
 
-    const eventsTypings = [];
-    if (declaration.events) {
-        for (const event of declaration.events) {
-            eventsTypings.push(`'${event.name}': CustomEvent;`);
-        }
-    }
-    eventsTypings.push('[key: string]: CustomEvent;');
-
-    const slotsTypings = [];
-    if (declaration.slots) {
-        for (const slot of declaration.slots) {
-            if (slot.name) {
-                slotsTypings.push(`'${slot.name}': {};`);
-            }
-        }
-    }
-
     const declContents = `
-declare const __propDef: {
-    props: ${getAttributes(definition.extend ?? definition.name)} & {
-        ${propertiesTypings.join('\n        ')}
-    };
-    events: {
-        ${eventsTypings.join('\n        ')}
-    };
-    slots: {
-        ${slotsTypings.join('\n        ')}
-    };
-};
-
-export type ${declaration.name}Props = typeof __propDef.props;
-export type ${declaration.name}Events = typeof __propDef.events;
-export type ${declaration.name}Slots = typeof __propDef.slots;
-export class ${declaration.name} extends SvelteComponent<${declaration.name}Props, ${declaration.name}Events, ${
-        declaration.name
-    }Slots> {
-}
+export declare const ${declaration.name}: Component<${getAttributes(definition.extend ?? definition.name)} & {
+    ${propertiesTypings.join('\n    ')}
+    [\`on\${string}\`]: (event: Event) => void;
+}>;
 `;
 
     return `${imports}${declContents}`;
