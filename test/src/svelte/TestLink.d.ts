@@ -8,5 +8,5 @@ export declare const TestLink: Component<HTMLAnchorAttributes & {
     numericProp?: BaseTestLink['numericProp'];
     objectProp?: BaseTestLink['objectProp'];
     defaultValue?: BaseTestLink['defaultValue'];
-    [`on${string}`]: (event: Event) => void;
+    [`on${string}`]: (event: Event | CustomEvent) => void;
 }>;

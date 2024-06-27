@@ -1,9 +1,9 @@
 <script>
     import 'plasma-test';
 
-    let __ref;
-    let __state = {};
     let {
+        children,
+        $$slots: __slots = {},
         stringProp,
         booleanProp,
         numericProp,
@@ -11,6 +11,9 @@
         defaultValue,
         ...props
     } = $props();
+    let __slot_icon = $derived.by(() => __make_snippet(__slots['icon']));
+    let __ref;
+    let __state = {};
 
     function __assign(props) {
         for (const key in props) {
@@ -19,6 +22,12 @@
                 __ref[key] = props[key];
             }
         }
+    }
+
+    function __make_snippet(fn) {
+        fn = fn || (() => {});
+        fn[Symbol.for('svelte.snippet')] = true;
+        return fn;
     }
 
     $effect(() => {
@@ -32,8 +41,8 @@
     });
 </script>
 
-<!-- svelte-ignore a11y-missing-attribute -->
+<!-- svelte-ignore a11y_missing_attribute -->
 <test-element
     bind:this={__ref}
     {...props}
-><slot name="icon" /><slot /></test-element>
+>{@render __slot_icon()}{@render children()}</test-element>

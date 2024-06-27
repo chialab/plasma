@@ -8,5 +8,5 @@ export declare const TestElement: Component<HTMLAttributes<HTMLElement> & {
     numericProp?: BaseTestElement['numericProp'];
     objectProp?: BaseTestElement['objectProp'];
     defaultValue?: BaseTestElement['defaultValue'];
-    [`on${string}`]: (event: Event) => void;
+    [`on${string}`]: (event: Event | CustomEvent) => void;
 }>;

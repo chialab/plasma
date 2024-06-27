@@ -1,17 +1,22 @@
 import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-    plugins: [svelte({ hot: !process.env.VITEST })],
+    define: {
+        'process.env': {},
+    },
+    plugins: [svelte()],
     resolve: {
         alias: {
             'plasma-test': fileURLToPath(new URL('./test/src/index.ts', import.meta.url)),
         },
     },
     test: {
-        include: ['test/**/*.test.ts', 'test/**/*.test.svelte.ts'],
         globals: true,
+        alias: {
+            '@testing-library/svelte': '@testing-library/svelte/svelte5',
+        },
         browser: {
             name: 'chromium',
             enabled: true,

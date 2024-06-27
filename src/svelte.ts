@@ -168,6 +168,15 @@ function getAttributes(tagName: string) {
     }
 }
 
+/**
+ * Create a valid JS identifier from a string.
+ * @param name The string to convert to an identifier.
+ * @returns The identifier.
+ */
+function createSlotIdentifier(name: string) {
+    return `__slot_${name.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+}
+
 export function generateSvelteComponent(entry: Entry, options: SvelteTransformOptions) {
     const { definition, declaration } = entry;
     const props = filterPublicMemebers(declaration).map((member) => member.name);
@@ -175,21 +184,21 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     if (declaration.slots) {
         for (const slot of declaration.slots) {
             if (slot.name) {
-                slots.push(`<slot name="${slot.name}" />`);
+                slots.push(`{@render ${createSlotIdentifier(slot.name)}()}`);
             }
         }
     }
-    slots.push('<slot />');
+    slots.push('{@render children()}');
 
     const markup = definition.extend
-        ? `<!-- svelte-ignore avoid-is -->
-<!-- svelte-ignore a11y-missing-attribute -->
+        ? `<!-- svelte-ignore attribute_avoid_is -->
+<!-- svelte-ignore a11y_missing_attribute -->
 <${definition.extend}
     bind:this={__ref}
     {...props}
     is="${definition.name}"
 >${slots.join('')}</${definition.extend}>`
-        : `<!-- svelte-ignore a11y-missing-attribute -->
+        : `<!-- svelte-ignore a11y_missing_attribute -->
 <${definition.name}
     bind:this={__ref}
     {...props}
@@ -198,12 +207,28 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     return `<script>
     import '${options.entrypoint}';
 
-    let __ref;
-    let __state = {};
     let {
+        children,${
+            declaration.slots &&
+            `
+        $$slots: __slots = {},`
+        }
         ${props.join(',\n        ')},
         ...props
-    } = $props();
+    } = $props();${
+        declaration.slots &&
+        `
+    ${declaration.slots
+        ?.map((slot) => {
+            if (slot.name) {
+                return `let ${createSlotIdentifier(slot.name)} = $derived.by(() => __make_snippet(__slots['${slot.name}']));`;
+            }
+            return '';
+        })
+        .join(',\n        ')}`
+    }
+    let __ref;
+    let __state = {};
 
     function __assign(props) {
         for (const key in props) {
@@ -212,6 +237,12 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
                 __ref[key] = props[key];
             }
         }
+    }
+
+    function __make_snippet(fn) {
+        fn = fn || (() => {});
+        fn[Symbol.for('svelte.snippet')] = true;
+        return fn;
     }
 
     $effect(() => {
@@ -238,7 +269,7 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } 
     const declContents = `
 export declare const ${declaration.name}: Component<${getAttributes(definition.extend ?? definition.name)} & {
     ${propertiesTypings.join('\n    ')}
-    [\`on\${string}\`]: (event: Event) => void;
+    [\`on\${string}\`]: (event: Event | CustomEvent) => void;
 }>;
 `;
 
