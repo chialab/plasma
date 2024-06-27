@@ -70,5 +70,8 @@ jobs:
         with:
           name: Plasma
 
+      - name: Install browser
+        run: ./node_modules/.bin/playwright install chromium --with-deps
+
       - name: Run tests
-        run: yarn test
+        run: yarn test --browser chromium
