@@ -12,7 +12,7 @@ export function filterPublicMemebers(declaration: CustomElementDeclaration) {
     }
 
     return declaration.members.filter((member) => {
-        if (member.kind !== 'field') {
+        if (member.kind !== 'field' || member.static) {
             return false;
         }
         if (member.privacy && member.privacy !== 'public') {
