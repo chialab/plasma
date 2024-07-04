@@ -65,10 +65,13 @@ jobs:
       - name: Install project dependencies
         run: yarn install
 
+      - name: Install browser
+        run: ./node_modules/.bin/playwright install chromium --with-deps
+
       - name: Fetch build artifacts
         uses: actions/download-artifact@v3
         with:
           name: Plasma
 
       - name: Run tests
-        run: yarn test
+        run: yarn test --browser chromium

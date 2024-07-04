@@ -32,12 +32,12 @@ export async function transform<F extends Frameworks>(
             : never
 ) {
     switch (framework) {
-        case Frameworks.Svelte:
-            return transformSvelte(entry, options);
-        case Frameworks.React:
-            return transformReact(entry, options);
         case Frameworks.Preact:
-            return transformPreact(entry, options);
+            return transformPreact(entry, options as PreactTransformOptions);
+        case Frameworks.React:
+            return transformReact(entry, options as ReactTransformOptions);
+        case Frameworks.Svelte:
+            return transformSvelte(entry, options as SvelteTransformOptions);
         default:
             throw new Error(`Unsupported framework: ${framework}`);
     }

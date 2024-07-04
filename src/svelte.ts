@@ -13,6 +13,11 @@ export interface SvelteTransformOptions {
      * The output directory to write the converted components to.
      */
     outdir: string;
+
+    /**
+     * The style entrypoint.
+     */
+    styleEntrypoint?: string;
 }
 
 function getAttributes(tagName: string) {
@@ -183,78 +188,44 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     }
     slots.push('<slot />');
 
-    const markup = definition.extend
-        ? `<${definition.extend}
-    bind:this={__ref}
-    is="${definition.name}"
-    use:__forwardEvents
+    const markup = `<!-- svelte-ignore attribute_avoid_is -->
+<${definition.extend ?? definition.name}${
+        definition.extend
+            ? `
+    is="${definition.name}"`
+            : ''
+    }
     {...$$restProps}
->${slots.join('')}</${definition.extend}>`
-        : `<${definition.name}
-    bind:this={__ref}
-    use:__forwardEvents
-    {...$$restProps}
->${slots.join('')}</${definition.name}>`;
+    use:__sync={{
+        ${props.map((propName) => `${propName},`).join('\n        ')}
+    }}
+>${slots.join('')}</${definition.extend ?? definition.name}>`;
 
     return `<script>
-    import { onMount, bubble, listen, get_current_component } from 'svelte/internal';
-    import '${options.entrypoint}';
+    import '${options.entrypoint}';${
+        options.styleEntrypoint
+            ? `
+    import '${options.styleEntrypoint}';`
+            : ''
+    }
 
-    let __ref;
-    let __mounted = false;
-    let __component = get_current_component();
-    let __boundEvents = [];
-    let __listeners = [];
-    let __on = __component.$on;
-    let __state = {
-        ${props.map((propName) => `'${propName}': undefined,`).join('\n        ')}
-    };
-
-    onMount(() => {
-        __mounted = true;
-
-        return () => {
-            __mounted = false;
+    function __sync(node, props) {
+        const state = {};
+        const assign = (node, props) => {
+            for (const key in props)
+                if (props[key] !== undefined || state[key] !== undefined)
+                    node[key] = state[key] = props[key];
         };
-    });
 
-    __component.$on = (event, ...args) => {
-        if (__mounted) {
-            __listeners.push(listen(__ref, event, __forward));
-        } else {
-            __boundEvents.push(event);
-        }
-
-        return __on.call(__component, event, ...args);
-    };
-
-    function __assign(props) {
-        for (const key in props) {
-            if (props[key] !== undefined || __state[key] !== undefined) {
-                __state[key] = __ref[key] = props[key];
-            }
-        }
-    }
-
-    function __forward(event) {
-        bubble(__component, event);
-    }
-
-    function __forwardEvents() {
-        while (__boundEvents.length) {
-            __listeners.push(listen(__ref, __boundEvents.pop(), __forward));
-        }
-
-        return () => {
-            __listeners.forEach((unlisten) => unlisten());
+        assign(node, props);
+        return {
+            update(newProps) {
+                assign(node, newProps);
+            },
         };
     }
 
     ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}
-
-    $: __ref && __mounted && __assign({
-        ${props.map((propName) => `${propName},`).join('\n        ')}
-    });
 </script>
 
 ${markup}`;
