@@ -40,6 +40,7 @@ program
 
     .argument('[input]', 'custom elements manifest path')
     .option('-e, --entrypoint <path>', 'module entrypoint')
+    .option('--style <path>', 'style module entrypoint')
     .option('-o, --outdir <outdir>', 'output directory')
     .option('-f, --frameworks <frameworks...>', 'the framework to convert to')
     .option('-y, --yes', 'convert all candidates to all available frameworks')
@@ -49,6 +50,7 @@ program
             sourceDir,
             options: {
                 entrypoint?: string;
+                style?: string;
                 outdir?: string;
                 frameworks?: Frameworks[];
                 yes?: boolean;
@@ -158,6 +160,7 @@ program
                                     );
                                     const outFile = await transform(entry, framework, {
                                         entrypoint: entrypoint as string,
+                                        styleEntrypoint: options.style,
                                         outdir: outDir,
                                     });
                                     task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
