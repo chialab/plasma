@@ -1,5 +1,11 @@
 # @chialab/plasma
 
+## 0.3.1
+
+### Patch Changes
+
+-   4943f2c: Discard static fields.
+
 ## 0.3.0
 
 ### Minor Changes
