@@ -244,9 +244,11 @@ import { ${declaration.name} as Base${declaration.name} } from '${options.entryp
 import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
 `;
 
-    const propertiesTypings = filterPublicMemebers(declaration).map(
-        (member) => `${member.name}?: Base${declaration.name}['${member.name}'];`
-    );
+    const propertiesTypings = filterPublicMemebers(declaration)
+        .map((member) => `${member.name}?: Base${declaration.name}['${member.name}'];`)
+        .concat(
+            declaration.events?.map((declaration) => `on${declaration.name}?: (event: CustomEvent) => boolean;`) ?? []
+        );
 
     const eventsTypings = [];
     if (declaration.events) {

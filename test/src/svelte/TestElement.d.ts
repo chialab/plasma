@@ -9,6 +9,7 @@ declare const __propDef: {
         numericProp?: BaseTestElement['numericProp'];
         objectProp?: BaseTestElement['objectProp'];
         defaultValue?: BaseTestElement['defaultValue'];
+        onstringchange?: (event: CustomEvent) => boolean;
     };
     events: {
         'stringchange': CustomEvent;
@@ -23,4 +24,5 @@ export type TestElementProps = typeof __propDef.props;
 export type TestElementEvents = typeof __propDef.events;
 export type TestElementSlots = typeof __propDef.slots;
 export class TestElement extends SvelteComponent<TestElementProps, TestElementEvents, TestElementSlots> {
+    getElement(): BaseTestElement;
 }

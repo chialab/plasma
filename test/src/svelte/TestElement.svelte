@@ -17,6 +17,12 @@
         };
     }
 
+    let __element;
+
+    export function getElement() {
+        return __element;
+    }
+
     export let stringProp = undefined;
     export let booleanProp = undefined;
     export let numericProp = undefined;
@@ -26,6 +32,7 @@
 
 <!-- svelte-ignore attribute_avoid_is -->
 <test-element
+    bind:this={__element}
     {...$$restProps}
     use:__sync={{
         stringProp,

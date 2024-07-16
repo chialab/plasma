@@ -9,6 +9,7 @@ declare const __propDef: {
         numericProp?: BaseTestLink['numericProp'];
         objectProp?: BaseTestLink['objectProp'];
         defaultValue?: BaseTestLink['defaultValue'];
+        onstringchange?: (event: CustomEvent) => boolean;
     };
     events: {
         'stringchange': CustomEvent;
@@ -23,4 +24,5 @@ export type TestLinkProps = typeof __propDef.props;
 export type TestLinkEvents = typeof __propDef.events;
 export type TestLinkSlots = typeof __propDef.slots;
 export class TestLink extends SvelteComponent<TestLinkProps, TestLinkEvents, TestLinkSlots> {
+    getElement(): BaseTestLink;
 }
