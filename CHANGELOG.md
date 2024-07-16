@@ -1,5 +1,11 @@
 # @chialab/plasma
 
+## 0.3.3
+
+### Patch Changes
+
+-   d989fc5: Improve event handlers typings in Svelte adapter.
+
 ## 0.3.2
 
 ### Patch Changes
