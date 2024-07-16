@@ -1,5 +1,12 @@
 # @chialab/plasma
 
+## 0.3.2
+
+### Patch Changes
+
+-   2ef631a: Expose real element from Svelte component.
+-   e982307: Add event listeners to Svelte known properties.
+
 ## 0.3.1
 
 ### Patch Changes
