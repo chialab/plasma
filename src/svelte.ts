@@ -189,7 +189,8 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     slots.push('<slot />');
 
     const markup = `<!-- svelte-ignore attribute_avoid_is -->
-<${definition.extend ?? definition.name}${
+<${definition.extend ?? definition.name}
+    bind:this={__element}${
         definition.extend
             ? `
     is="${definition.name}"`
@@ -223,6 +224,11 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
                 assign(node, newProps);
             },
         };
+    }
+
+    let __element;
+    export function getElement() {
+        return __element;
     }
 
     ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}
@@ -278,6 +284,7 @@ export type ${declaration.name}Slots = typeof __propDef.slots;
 export class ${declaration.name} extends SvelteComponent<${declaration.name}Props, ${declaration.name}Events, ${
         declaration.name
     }Slots> {
+    getElement(): Base${declaration.name};
 }
 `;
 
