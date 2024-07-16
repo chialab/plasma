@@ -1,15 +1,15 @@
 import { SvelteComponent } from 'svelte';
 import { TestLink as BaseTestLink } from 'plasma-test';
-import { HTMLAnchorAttributes } from 'svelte/elements';
+import { HTMLAnchorAttributes, type EventHandler } from 'svelte/elements';
 
 declare const __propDef: {
-    props: HTMLAnchorAttributes & {
+    props: Omit<HTMLAnchorAttributes, 'stringProp' | 'booleanProp' | 'numericProp' | 'objectProp' | 'defaultValue' | 'onstringchange'> & {
         stringProp?: BaseTestLink['stringProp'];
         booleanProp?: BaseTestLink['booleanProp'];
         numericProp?: BaseTestLink['numericProp'];
         objectProp?: BaseTestLink['objectProp'];
         defaultValue?: BaseTestLink['defaultValue'];
-        onstringchange?: (event: CustomEvent) => boolean;
+        onstringchange?: EventHandler<CustomEvent, Basestringchange>;
     };
     events: {
         'stringchange': CustomEvent;

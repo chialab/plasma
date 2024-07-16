@@ -241,13 +241,15 @@ export function generateSvelteTypings(entry: Entry, options: SvelteTransformOpti
     const { definition, declaration } = entry;
     const imports = `import { SvelteComponent } from 'svelte';
 import { ${declaration.name} as Base${declaration.name} } from '${options.entrypoint}';
-import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } from 'svelte/elements';
+import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]}, type EventHandler } from 'svelte/elements';
 `;
 
     const propertiesTypings = filterPublicMemebers(declaration)
         .map((member) => `${member.name}?: Base${declaration.name}['${member.name}'];`)
         .concat(
-            declaration.events?.map((declaration) => `on${declaration.name}?: (event: CustomEvent) => boolean;`) ?? []
+            declaration.events?.map(
+                (declaration) => `on${declaration.name}?: EventHandler<CustomEvent, Base${declaration.name}>;`
+            ) ?? []
         );
 
     const eventsTypings = [];
@@ -267,9 +269,13 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]} } 
         }
     }
 
+    const definitions = filterPublicMemebers(declaration)
+        .map((member) => member.name)
+        .concat(declaration.events?.map((event) => `on${event.name}`) ?? []);
+
     const declContents = `
 declare const __propDef: {
-    props: ${getAttributes(definition.extend ?? definition.name)} & {
+    props: Omit<${getAttributes(definition.extend ?? definition.name)}, ${definitions.map((definition) => `'${definition}'`).join(' | ')}> & {
         ${propertiesTypings.join('\n        ')}
     };
     events: {

@@ -18,7 +18,6 @@
     }
 
     let __element;
-
     export function getElement() {
         return __element;
     }
