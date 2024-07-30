@@ -1,5 +1,11 @@
 # @chialab/plasma
 
+## 0.3.4
+
+### Patch Changes
+
+-   8ee0a59: Fix event declarations in svelte.
+
 ## 0.3.3
 
 ### Patch Changes
