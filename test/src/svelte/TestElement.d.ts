@@ -9,7 +9,7 @@ declare const __propDef: {
         numericProp?: BaseTestElement['numericProp'];
         objectProp?: BaseTestElement['objectProp'];
         defaultValue?: BaseTestElement['defaultValue'];
-        onstringchange?: EventHandler<CustomEvent, Basestringchange>;
+        onstringchange?: EventHandler<CustomEvent, BaseTestElement>;
     };
     events: {
         'stringchange': CustomEvent;

@@ -248,7 +248,7 @@ import { ${getAttributes(definition.extend ?? definition.name).split('<')[0]}, t
         .map((member) => `${member.name}?: Base${declaration.name}['${member.name}'];`)
         .concat(
             declaration.events?.map(
-                (declaration) => `on${declaration.name}?: EventHandler<CustomEvent, Base${declaration.name}>;`
+                (event) => `on${event.name}?: EventHandler<CustomEvent, Base${declaration.name}>;`
             ) ?? []
         );
 
