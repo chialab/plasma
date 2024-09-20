@@ -1,5 +1,11 @@
 # @chialab/plasma
 
+## 0.4.1
+
+### Patch Changes
+
+-   e02cc49: Support custom elements without assign function.
+
 ## 0.4.0
 
 ### Minor Changes
