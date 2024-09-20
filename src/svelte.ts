@@ -13,11 +13,6 @@ export interface SvelteTransformOptions {
      * The output directory to write the converted components to.
      */
     outdir: string;
-
-    /**
-     * The style entrypoint.
-     */
-    styleEntrypoint?: string;
 }
 
 function getAttributes(tagName: string) {
@@ -203,12 +198,7 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
 >${slots.join('')}</${definition.extend ?? definition.name}>`;
 
     return `<script>
-    import '${options.entrypoint}';${
-        options.styleEntrypoint
-            ? `
-    import '${options.styleEntrypoint}';`
-            : ''
-    }
+    import '${options.entrypoint}';
 
     function __sync(node, props) {
         const state = {};
@@ -232,9 +222,13 @@ export function generateSvelteComponent(entry: Entry, options: SvelteTransformOp
     let __element;
     export function getElement() {
         return __element;
-    }
+    }${
+        props.length
+            ? `
 
-    ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}
+    ${props.map((propName) => `export let ${propName} = undefined;`).join('\n    ')}`
+            : ''
+    }
 </script>
 
 ${markup}`;

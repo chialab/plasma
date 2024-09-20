@@ -12,13 +12,6 @@ The custom elements manifest path to use to generate the wrappers. If not specif
 The original module entrypoint to use to import component implementation and types.  
 If the entrypoint is the main module of the package, it matches the name of NPM module.
 
-## Style entrypoint
-
--   `--style`
--   Type: `string`
-
-The original module entrypoint to use to import component styles.
-
 ## Outdir
 
 -   `--outdir`, `-o`

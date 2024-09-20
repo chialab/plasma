@@ -4,9 +4,12 @@
     function __sync(node, props) {
         const state = {};
         const assign = (node, props) => {
-            for (const key in props)
-                if (props[key] !== undefined || state[key] !== undefined)
-                    node[key] = state[key] = props[key];
+            node.assign(Object.entries(props).reduce((acc, [key, value]) => {
+                if (props[key] !== undefined || state[key] !== undefined) {
+                    acc[key] = state[key] = props[key];
+                }
+                return acc;
+            }, {}));
         };
 
         assign(node, props);
