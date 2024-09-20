@@ -1,5 +1,15 @@
 # @chialab/plasma
 
+## 0.4.0
+
+### Minor Changes
+
+-   5d77c5e: Rollback `styleEntrypoint` option: importing the css module in the svelte file can cause problems with vite preprocessor. The css module should be imported manually.
+
+### Patch Changes
+
+-   8900979: Use `.assign` method for svelte component properties.
+
 ## 0.3.4
 
 ### Patch Changes
