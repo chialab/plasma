@@ -2,10 +2,10 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import chalk from 'chalk';
 import { program } from 'commander';
 import type { Package } from 'custom-elements-manifest';
 import { Listr } from 'listr2';
+import pc from 'picocolors';
 import prompts from 'prompts';
 import { candidates, SUPPORTED, transform, UNSUPPORTED, type Frameworks } from './index';
 import { findJson, validateManifest } from './utils';
@@ -13,17 +13,17 @@ import { findJson, validateManifest } from './utils';
 const colorFramework = (framework: string) => {
     switch (framework) {
         case 'svelte':
-            return chalk.red(framework);
+            return pc.red(framework);
         case 'angular':
-            return chalk.redBright(framework);
+            return pc.redBright(framework);
         case 'preact':
-            return chalk.cyanBright(framework);
+            return pc.cyanBright(framework);
         case 'react':
-            return chalk.blueBright(framework);
+            return pc.blueBright(framework);
         case 'astro':
-            return chalk.yellow(framework);
+            return pc.yellow(framework);
         case 'vue':
-            return chalk.green(framework);
+            return pc.green(framework);
         default:
             return framework;
     }
@@ -145,7 +145,7 @@ program
                     task: (ctx, task) =>
                         task.newListr(
                             frameworks.map((framework) => ({
-                                title: `Converting ${chalk.whiteBright(component)} to ${colorFramework(framework)}…`,
+                                title: `Converting ${pc.whiteBright(component)} to ${colorFramework(framework)}…`,
                                 task: async (ctx, task) => {
                                     const entry = data.find(({ declaration }) => declaration.name === component);
                                     if (!entry) {
@@ -160,9 +160,9 @@ program
                                         entrypoint: entrypoint as string,
                                         outdir: outDir,
                                     });
-                                    task.title = `Converted ${chalk.whiteBright(component)} to ${colorFramework(
+                                    task.title = `Converted ${pc.whiteBright(component)} to ${colorFramework(
                                         framework
-                                    )}: ${chalk.grey(outFile)}`;
+                                    )}: ${pc.gray(outFile)}`;
                                     task.output = outFile;
                                 },
                             })),
