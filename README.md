@@ -25,8 +25,8 @@ npm run plasma
 
 ## Documentation
 
--   [Get started](https://chialab.github.io/plasma/guide)
--   [Options](https://chialab.github.io/plasma/guide/options)
+- [Get started](https://chialab.github.io/plasma/guide)
+- [Options](https://chialab.github.io/plasma/guide/options)
 
 ---
 
